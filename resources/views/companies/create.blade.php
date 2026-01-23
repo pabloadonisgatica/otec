@@ -1,12 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Nueva Empresa
+            Nueva empresa
         </h2>
     </x-slot>
 
-    <div class="py-8">
+    <div class="py-6">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+            <x-breadcrumb :items="$breadcrumbs" />
+
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="p-6">
                     <form method="POST" action="{{ route('companies.store') }}" class="space-y-4">
@@ -14,13 +16,16 @@
 
                         @include('companies.partials.form', ['company' => null])
 
-                        <div class="flex gap-2">
-                            <button class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm">
-                                Guardar
-                            </button>
-                            <a href="{{ route('companies.index') }}" class="px-4 py-2 border rounded-lg text-sm">
+                        <div class="pt-4 flex justify-end gap-2">
+                            <a href="{{ route('companies.index') }}"
+                               class="px-4 py-2 rounded bg-gray-100 text-gray-800">
                                 Volver
                             </a>
+
+                            <button type="submit"
+                                    class="px-4 py-2 rounded bg-indigo-600 text-white">
+                                Guardar
+                            </button>
                         </div>
                     </form>
                 </div>

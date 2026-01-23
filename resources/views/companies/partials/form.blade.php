@@ -34,6 +34,32 @@
     <label class="block text-sm font-medium">Dirección</label>
     <input name="address" value="{{ $v('address') }}" class="mt-1 w-full rounded border-gray-300">
 </div>
+@php
+    $regions = config('chile.regions', []);
+    $selectedRegion = old('region', $company->region ?? '');
+    $selectedCommune = old('commune', $company->commune ?? '');
+@endphp
+
+<div>
+    <label class="block text-sm font-medium">Región</label>
+    <select name="region" id="region" class="mt-1 w-full rounded border-gray-300">
+        <option value="">Selecciona región</option>
+        @foreach(array_keys($regions) as $region)
+            <option value="{{ $region }}" @selected($selectedRegion === $region)>{{ $region }}</option>
+        @endforeach
+    </select>
+    @error('region') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
+</div>
+
+<div>
+    <label class="block text-sm font-medium">Comuna</label>
+    <select name="commune" id="commune" class="mt-1 w-full rounded border-gray-300">
+        <option value="">Selecciona comuna</option>
+    </select>
+    @error('commune') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
+</div>
+
+
 
 <hr class="my-4">
 
@@ -54,3 +80,29 @@
     <label class="block text-sm font-medium">Teléfono contacto</label>
     <input name="contact_phone" value="{{ $v('contact_phone') }}" class="mt-1 w-full rounded border-gray-300">
 </div>
+<script>
+    const REGIONS = @json($regions);
+    const regionSelect = document.getElementById('region');
+    const communeSelect = document.getElementById('commune');
+    const selectedCommune = @json($selectedCommune);
+
+    function loadCommunes(region) {
+        communeSelect.innerHTML = '<option value="">Selecciona comuna</option>';
+        if (!region || !REGIONS[region]) return;
+
+        REGIONS[region].forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c;
+            opt.textContent = c;
+            if (c === selectedCommune) opt.selected = true;
+            communeSelect.appendChild(opt);
+        });
+    }
+
+    loadCommunes(regionSelect.value);
+
+    regionSelect.addEventListener('change', (e) => {
+        communeSelect.value = '';
+        loadCommunes(e.target.value);
+    });
+</script>
