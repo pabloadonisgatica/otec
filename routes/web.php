@@ -3,6 +3,10 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\InstructorController;
+use App\Http\Controllers\DocumentController;
+
+
 
 
 Route::get('/', function () {
@@ -18,6 +22,17 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('companies', CompanyController::class);
+    Route::resource('instructors', InstructorController::class);
+
+Route::get('/documents/{type}/{id}/{index}', [DocumentController::class, 'show'])->name('documents.show');
+Route::get('/documents/{type}/{id}/{index}/download', [DocumentController::class, 'download'])->name('documents.download');
+Route::delete('/documents/{type}/{id}/{index}', [DocumentController::class, 'delete'])->name('documents.delete');
+
+Route::get('/instructors/{instructor}/json', [InstructorController::class, 'show'])
+    ->name('instructors.json');
+
+
+
 });
 
 
