@@ -12,7 +12,7 @@
                     <p class="text-lg font-semibold mb-4">Módulos</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <a href="#" class="block p-4 border rounded-lg hover:bg-gray-50">
+                        <a href="/companies" class="block p-4 border rounded-lg hover:bg-gray-50">
                             <div class="font-semibold">Empresas</div>
                             <div class="text-sm text-gray-600">Crear, editar y listar empresas</div>
                         </a>
@@ -27,12 +27,12 @@
                             <div class="text-sm text-gray-600">Gestión de cursos y fechas</div>
                         </a>
 
-                        <a href="#" class="block p-4 border rounded-lg hover:bg-gray-50">
+                        <a href="/instructors" class="block p-4 border rounded-lg hover:bg-gray-50">
                             <div class="font-semibold">Relatores</div>
                             <div class="text-sm text-gray-600">Registro y documentos</div>
                         </a>
 
-                        <a href="#" class="block p-4 border rounded-lg hover:bg-gray-50">
+                        <a href="/participants" class="block p-4 border rounded-lg hover:bg-gray-50">
                             <div class="font-semibold">Participantes</div>
                             <div class="text-sm text-gray-600">Registro y listado</div>
                         </a>
