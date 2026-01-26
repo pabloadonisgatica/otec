@@ -6,6 +6,8 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ParticipantController;
+use App\Http\Controllers\CourseController;
+
 
 
 Route::get('/', function () {
@@ -30,6 +32,7 @@ Route::middleware('auth')->group(function () {
     Route::get('participants/import', [ParticipantController::class, 'importForm'])->name('participants.import.form');
     Route::post('participants/import', [ParticipantController::class, 'import'])->name('participants.import');
     Route::resource('participants', ParticipantController::class);
+    Route::resource('courses', CourseController::class);
    
 
 

@@ -22,7 +22,7 @@
                             <div class="text-sm text-gray-600">Crear y administrar presupuestos</div>
                         </a>
 
-                        <a href="#" class="block p-4 border rounded-lg hover:bg-gray-50">
+                        <a href="/courses" class="block p-4 border rounded-lg hover:bg-gray-50">
                             <div class="font-semibold">Cursos</div>
                             <div class="text-sm text-gray-600">Gestión de cursos y fechas</div>
                         </a>
