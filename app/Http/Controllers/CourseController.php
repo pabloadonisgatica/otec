@@ -7,6 +7,9 @@ use App\Models\Course;
 use Illuminate\Http\Request;
 use App\Models\Instructor;
 use App\Models\CourseContent;
+use App\Models\CourseFolioSequence;
+use Illuminate\Support\Facades\DB;
+
 
 
 class CourseController extends Controller
@@ -39,78 +42,95 @@ class CourseController extends Controller
     }
 
 
-  public function store(Request $request)
+
+public function store(Request $request)
 {
     $data = $request->validate([
-        'company_id' => ['required', 'exists:companies,id'],
-        'sence_code' => ['nullable', 'string', 'max:255'],
+        'company_id' => ['nullable', 'exists:companies,id'],
+
+        'course_type' => ['required', 'in:sence,licitacion,privado'],
         'name' => ['required', 'string', 'max:255'],
 
-        'hours' => ['nullable', 'integer', 'min:0'],
+        'instruction_modalities' => ['nullable', 'array'],
+        'instruction_modalities.*' => ['string'],
+
         'start_date' => ['nullable', 'date'],
         'end_date' => ['nullable', 'date'],
-        'status' => ['required', 'string'],
 
-        // SENCE
-        'activity_type' => ['nullable', 'in:curso,seminario'],
-        'instruction_modality' => ['nullable', 'in:presencial,elearning_sync,elearning_async,distance_self'],
-        'attendance_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
-        'min_grade' => ['nullable', 'numeric', 'min:0'],
-        'min_hours' => ['nullable', 'integer', 'min:0'],
-
-        'participants_count' => ['nullable', 'integer', 'min:0'],
-        'value_per_participant' => ['nullable', 'integer', 'min:0'],
-
-        'sence_request_date' => ['nullable', 'date'],
-        'sence_expiration_date' => ['nullable', 'date'],
+        'sence_approval_date' => ['nullable', 'date'],
 
         'technical_foundation' => ['nullable', 'string'],
         'target_population' => ['nullable', 'string'],
         'general_objectives' => ['nullable', 'string'],
         'teaching_methodology' => ['nullable', 'string'],
-
         'notes' => ['nullable', 'string'],
 
-        // Relatores
-        'instructor_ids' => ['nullable', 'array'],
-        'instructor_ids.*' => ['integer', 'exists:instructors,id'],
+        'hours' => ['nullable', 'numeric'],
 
-        // Contenidos
+        'value_per_participant' => ['nullable', 'integer'],
+        'participants_count' => ['nullable', 'integer'],
+
+        'attendance_percentage' => ['nullable', 'numeric'],
+        'min_grade' => ['nullable', 'numeric'],
+
+        'status' => ['nullable', 'string'],
+        'activity_type' => ['nullable', 'string'],
+        'sence_code' => ['nullable', 'string'],
+
+        // ✅ contenidos
         'contents' => ['nullable', 'array'],
         'contents.*.activity' => ['nullable', 'string'],
         'contents.*.content' => ['nullable', 'string'],
-        'contents.*.hours_theoretical' => ['nullable', 'integer', 'min:0'],
-        'contents.*.hours_practical' => ['nullable', 'integer', 'min:0'],
-        'contents.*.hours_elearning' => ['nullable', 'integer', 'min:0'],
+        'contents.*.hours_theoretical' => ['nullable', 'numeric', 'min:0'],
+        'contents.*.hours_practical' => ['nullable', 'numeric', 'min:0'],
+        'contents.*.hours_elearning' => ['nullable', 'numeric', 'min:0'],
     ]);
 
-    // 1) Crear curso
-    $course = Course::create($data);
+    // ✅ Tomar contenidos fuera de la transacción
+    $contents = $request->input('contents', []);
 
-    // 2) Relatores
-    $course->instructors()->sync($request->input('instructor_ids', []));
+    $course = DB::transaction(function () use ($data, $contents) {
 
-    // 3) Contenidos
-    foreach ($request->input('contents', []) as $i => $row) {
-        $course->contents()->create([
-            'activity' => $row['activity'] ?? null,
-            'content' => $row['content'] ?? null,
-            'hours_theoretical' => $row['hours_theoretical'] ?? null,
-            'hours_practical' => $row['hours_practical'] ?? null,
-            'hours_elearning' => $row['hours_elearning'] ?? null,
-            'sort_order' => $i,
-        ]);
-    }
+        $seq = CourseFolioSequence::query()->lockForUpdate()->first();
+
+        if (!$seq) {
+            $seq = CourseFolioSequence::create(['last_number' => 0]);
+            $seq->refresh();
+        }
+
+        $next = (int) $seq->last_number + 1;
+        $seq->update(['last_number' => $next]);
+
+        $folio = 'PR-' . str_pad((string) $next, 8, '0', STR_PAD_LEFT);
+        $data['folio'] = $folio;
+
+        // 1) Crear curso
+        $course = Course::create($data);
+
+        // 2) Guardar contenidos
+        foreach ($contents as $i => $row) {
+            $course->contents()->create([
+                'activity' => $row['activity'] ?? null,
+                'content' => $row['content'] ?? null,
+                'hours_theoretical' => $row['hours_theoretical'] ?? null,
+                'hours_practical' => $row['hours_practical'] ?? null,
+                'hours_elearning' => $row['hours_elearning'] ?? null,
+                'sort_order' => $i,
+            ]);
+        }
+
+        return $course;
+    });
 
     return redirect()
         ->route('courses.index')
-        ->with('status', 'Curso creado.');
+        ->with('status', 'Curso creado con folio ' . $course->folio);
 }
 
 
 
     public function edit(Course $course)
-    {
+{
         $breadcrumbs = [
             ['label' => 'Cursos', 'url' => route('courses.index')],
             ['label' => 'Editar', 'url' => route('courses.edit', $course)],
@@ -122,32 +142,38 @@ class CourseController extends Controller
         $course->load('instructors', 'contents');
 
         return view('courses.edit', compact('course', 'breadcrumbs', 'companies', 'instructors'));
-    }
+}
 
 public function update(Request $request, Course $course)
 {
     $data = $request->validate([
-        'company_id' => ['required', 'exists:companies,id'],
-        'sence_code' => ['nullable', 'string', 'max:255'],
+        'company_id' => ['nullable', 'exists:companies,id'],
+
+        'course_type' => ['required', 'in:sence,licitacion,privado'],
         'name' => ['required', 'string', 'max:255'],
 
-        'hours' => ['nullable', 'integer', 'min:0'],
+
+        'sence_code' => ['nullable', 'string', 'max:255'],
+        'sence_approval_date' => ['nullable', 'date'],
+
+
+        'hours' => ['nullable', 'numeric', 'min:0'],
+
         'start_date' => ['nullable', 'date'],
         'end_date' => ['nullable', 'date'],
-        'status' => ['required', 'string'],
+        'status' => ['nullable', 'string'],
 
-        // SENCE
         'activity_type' => ['nullable', 'in:curso,seminario'],
-        'instruction_modality' => ['nullable', 'in:presencial,elearning_sync,elearning_async,distance_self'],
+
+        'instruction_modalities' => ['nullable', 'array'],
+        'instruction_modalities.*' => ['in:presencial,elearning_sync,elearning_async,distance_self'],
+
+
         'attendance_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
         'min_grade' => ['nullable', 'numeric', 'min:0'],
-        'min_hours' => ['nullable', 'integer', 'min:0'],
 
         'participants_count' => ['nullable', 'integer', 'min:0'],
         'value_per_participant' => ['nullable', 'integer', 'min:0'],
-
-        'sence_request_date' => ['nullable', 'date'],
-        'sence_expiration_date' => ['nullable', 'date'],
 
         'technical_foundation' => ['nullable', 'string'],
         'target_population' => ['nullable', 'string'],
@@ -156,26 +182,18 @@ public function update(Request $request, Course $course)
 
         'notes' => ['nullable', 'string'],
 
-        // Relatores
-        'instructor_ids' => ['nullable', 'array'],
-        'instructor_ids.*' => ['integer', 'exists:instructors,id'],
-
-        // Contenidos
         'contents' => ['nullable', 'array'],
         'contents.*.activity' => ['nullable', 'string'],
         'contents.*.content' => ['nullable', 'string'],
-        'contents.*.hours_theoretical' => ['nullable', 'integer', 'min:0'],
-        'contents.*.hours_practical' => ['nullable', 'integer', 'min:0'],
-        'contents.*.hours_elearning' => ['nullable', 'integer', 'min:0'],
+        'contents.*.hours_theoretical' => ['nullable', 'numeric', 'min:0'],
+        'contents.*.hours_practical' => ['nullable', 'numeric', 'min:0'],
+        'contents.*.hours_elearning' => ['nullable', 'numeric', 'min:0'],
     ]);
+    unset($data['folio']);
 
-    // 1) Actualizar curso
     $course->update($data);
 
-    // 2) Relatores
-    $course->instructors()->sync($request->input('instructor_ids', []));
-
-    // 3) Contenidos: estrategia simple y segura (recrear)
+    // contenidos: borrar y recrear
     $course->contents()->delete();
 
     foreach ($request->input('contents', []) as $i => $row) {
@@ -196,15 +214,18 @@ public function update(Request $request, Course $course)
 
 
 
-    public function destroy(Course $course)
-    {
-        $course->delete();
+public function destroy(Course $course)
+{
+    // Si el curso está asociado a presupuestos (tabla pivote budget_courses),
+    // primero eliminamos esas relaciones para que MySQL permita borrar el curso.
+    $course->budgets()->detach();
 
-        return redirect()
-            ->route('courses.index')
-            ->with('status', 'Curso eliminado.');
-    }
+    $course->delete();
 
+    return redirect()
+        ->route('courses.index')
+        ->with('status', 'Curso eliminado.');
+}
     // show() lo implementamos después con modal/detalle si aplica
     public function show(Course $course)
     {

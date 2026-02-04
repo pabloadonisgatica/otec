@@ -4,9 +4,9 @@
             <h3 class="text-lg font-semibold text-gray-900">
                 {{ $course->name }}
             </h3>
+
             <p class="text-sm text-gray-600">
-                {{ $course->company?->name ?? 'Sin empresa' }} ·
-                <span class="font-medium">{{ strtoupper($course->status ?? 'draft') }}</span>
+                <span class="font-medium">{{ $course->folio ?? '—' }}</span>
             </p>
         </div>
 
@@ -17,27 +17,54 @@
         </button>
     </div>
 
+    @php
+        $typeLabels = [
+            'sence' => 'SENCE',
+            'licitacion' => 'Licitación pública',
+            'privado' => 'Privado',
+        ];
+
+        $modLabels = [
+            'presencial' => 'Presencial',
+            'elearning_sync' => 'E-learning Sincrónico',
+            'elearning_async' => 'E-learning Asincrónico',
+            'distance_self' => 'Autoaprendizaje',
+        ];
+
+        $modalities = $course->instruction_modalities ?? [];
+        if (!is_array($modalities)) $modalities = [];
+
+        $senceExpiry = null;
+        if ($course->course_type === 'sence' && $course->sence_approval_date) {
+            $senceExpiry = $course->sence_approval_date->copy()->addYears(4);
+        }
+    @endphp
+
     <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+
+        <div class="rounded border p-3">
+            <div class="text-xs text-gray-500">Tipo de curso</div>
+            <div class="font-medium">
+                {{ $typeLabels[$course->course_type] ?? ($course->course_type ?: '—') }}
+            </div>
+        </div>
+
         <div class="rounded border p-3">
             <div class="text-xs text-gray-500">Código SENCE</div>
             <div class="font-medium">{{ $course->sence_code ?: '—' }}</div>
         </div>
 
-        <div class="rounded border p-3">
-            <div class="text-xs text-gray-500">Tipo / Modalidad</div>
+        <div class="rounded border p-3 md:col-span-2">
+            <div class="text-xs text-gray-500">Modalidad de instrucción</div>
             <div class="font-medium">
-                {{ $course->activity_type ?: '—' }} · {{ $course->instruction_modality ?: '—' }}
+                @if(count($modalities))
+                    {{ collect($modalities)->map(fn($m) => $modLabels[$m] ?? $m)->join(' · ') }}
+                @else
+                    —
+                @endif
             </div>
         </div>
 
-        <div class="rounded border p-3">
-            <div class="text-xs text-gray-500">Fechas</div>
-            <div class="font-medium">
-                {{ $course->start_date?->format('d-m-Y') ?? '—' }}
-                →
-                {{ $course->end_date?->format('d-m-Y') ?? '—' }}
-            </div>
-        </div>
 
         <div class="rounded border p-3">
             <div class="text-xs text-gray-500">Horas totales</div>
@@ -48,13 +75,6 @@
             <div class="text-xs text-gray-500">% asistencia / Nota mín.</div>
             <div class="font-medium">
                 {{ $course->attendance_percentage ?? '—' }}% · {{ $course->min_grade ?? '—' }}
-            </div>
-        </div>
-
-        <div class="rounded border p-3">
-            <div class="text-xs text-gray-500">Participantes / Valor p/p</div>
-            <div class="font-medium">
-                {{ $course->participants_count ?? '—' }} · {{ $course->value_per_participant ?? '—' }}
             </div>
         </div>
 
@@ -74,23 +94,11 @@
         </div>
 
         <div class="md:col-span-2 rounded border p-3">
-            <div class="text-xs text-gray-500">Metodología de enseñanza</div>
+            <div class="text-xs text-gray-500">Método o técnica de enseñanza</div>
             <div class="mt-1 whitespace-pre-line">{{ $course->teaching_methodology ?: '—' }}</div>
         </div>
     </div>
 
-    <div class="mt-6">
-        <h4 class="font-semibold text-gray-900 mb-2">Relatores</h4>
-        @if($course->instructors->count())
-            <ul class="list-disc pl-5 text-sm text-gray-700">
-                @foreach($course->instructors as $ins)
-                    <li>{{ $ins->name }}</li>
-                @endforeach
-            </ul>
-        @else
-            <p class="text-sm text-gray-500">—</p>
-        @endif
-    </div>
 
     <div class="mt-6">
         <h4 class="font-semibold text-gray-900 mb-2">Actividades y contenidos</h4>
@@ -110,8 +118,8 @@
                     <tbody class="divide-y">
                         @foreach($course->contents as $row)
                             <tr>
-                                <td class="px-3 py-2">{{ $row->activity ?: '—' }}</td>
-                                <td class="px-3 py-2">{{ $row->content ?: '—' }}</td>
+                                <td class="px-3 py-2 whitespace-pre-line">{{ $row->activity ?: '—' }}</td>
+                                <td class="px-3 py-2 whitespace-pre-line">{{ $row->content ?: '—' }}</td>
                                 <td class="px-3 py-2 text-right">{{ $row->hours_theoretical ?? 0 }}</td>
                                 <td class="px-3 py-2 text-right">{{ $row->hours_practical ?? 0 }}</td>
                                 <td class="px-3 py-2 text-right">{{ $row->hours_elearning ?? 0 }}</td>

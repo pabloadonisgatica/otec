@@ -31,75 +31,111 @@
                             <thead class="text-left text-gray-600 border-b">
                             <tr>
                                 <th class="py-2 pr-4">Curso</th>
-                                <th class="py-2 pr-4">Empresa</th>
-                                <th class="py-2 pr-4">Estado</th>
-                                <th class="py-2 pr-4">Fechas</th>
+                                
+                                <th class="py-2 pr-4">Tipo</th>
+                                <th class="py-2 pr-4">Modalidades</th>
+                                
+                                <th class="py-2 pr-4 text-right">Horas</th>
                                 <th class="py-2 pr-4 text-right">Acciones</th>
                             </tr>
+
                             </thead>
                             <tbody class="divide-y">
-                            @forelse($courses as $course)
-                                <tr class="hover:bg-gray-50">
-                                    <td class="py-3 pr-4">
-                                        <div class="font-medium text-gray-900">
-                                            {{ $course->name }}
-                                        </div>
-                                        <div class="text-gray-500">
-                                            @if($course->sence_code)
-                                                <span>SENCE: {{ $course->sence_code }}</span>
+                            @php
+                                    $typeLabels = [
+                                        'sence' => 'SENCE',
+                                        'licitacion' => 'Licitación',
+                                        'privado' => 'Privado',
+                                    ];
+
+                                    $modLabels = [
+                                        'presencial' => 'Presencial',
+                                        'elearning_sync' => 'E-learning Sync',
+                                        'elearning_async' => 'E-learning Async',
+                                        'distance_self' => 'Autoaprendizaje',
+                                    ];
+                                @endphp
+
+                                @forelse($courses as $course)
+                                    @php
+                                        $modalities = $course->instruction_modalities ?? [];
+                                        if (!is_array($modalities)) $modalities = [];
+
+                                        $sd = $course->start_date?->format('d-m-Y');
+                                        $ed = $course->end_date?->format('d-m-Y');
+                                    @endphp
+
+                                    <tr class="hover:bg-gray-50">
+                                        {{-- Curso + folio --}}
+                                        <td class="py-3 pr-4">
+                                            <div class="font-medium text-gray-900">
+                                                {{ $course->name }}
+                                            </div>
+
+                                            <div class="text-gray-500">
+                                                <span class="font-medium">{{ $course->folio ?? '—' }}</span>
+                                               
+                                            </div>
+                                        </td>
+
+                                        
+
+                                        {{-- Tipo --}}
+                                        <td class="py-3 pr-4">
+                                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700">
+                                                {{ $typeLabels[$course->course_type] ?? ($course->course_type ?: '—') }}
+                                            </span>
+                                        </td>
+
+                                        {{-- Modalidades --}}
+                                        <td class="py-3 pr-4 text-gray-700">
+                                            @if(count($modalities))
+                                                {{ collect($modalities)->map(fn($m) => $modLabels[$m] ?? $m)->join(' · ') }}
+                                            @else
+                                                —
                                             @endif
-                                        </div>
-                                    </td>
+                                        </td>
 
-                                    <td class="py-3 pr-4 text-gray-700">
-                                        {{ $course->company?->name ?? '—' }}
-                                    </td>
+                                       
 
-                                    <td class="py-3 pr-4">
-                                        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700">
-                                            {{ $course->status }}
-                                        </span>
-                                    </td>
+                                        {{-- Horas --}}
+                                        <td class="py-3 pr-4 text-right text-gray-900 font-medium">
+                                            {{ $course->hours ?? '—' }}
+                                        </td>
 
-                                    <td class="py-3 pr-4 text-gray-700">
-                                        @php
-                                            $sd = $course->start_date?->format('d-m-Y');
-                                            $ed = $course->end_date?->format('d-m-Y');
-                                        @endphp
-                                        {{ $sd || $ed ? ($sd . ' → ' . $ed) : '—' }}
-                                    </td>
-
-                                    <td class="py-3 text-right">
-                                        <button type="button"
-                                                class="text-gray-700 hover:text-gray-900 font-medium"
-                                                @click="open(@js($course->id))">
-                                            Ver
-                                        </button>
-
-                                        <a href="{{ route('courses.edit', $course) }}"
-                                           class="ml-3 text-indigo-600 hover:text-indigo-900 font-medium">
-                                            Editar
-                                        </a>
-
-                                        <form action="{{ route('courses.destroy', $course) }}"
-                                              method="POST"
-                                              class="inline"
-                                              onsubmit="return confirm('¿Eliminar este curso?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="ml-3 text-red-600 hover:text-red-800 font-medium">
-                                                Eliminar
+                                        {{-- Acciones --}}
+                                        <td class="py-3 pr-4 text-right">
+                                            <button type="button"
+                                                    class="text-gray-700 hover:text-gray-900 font-medium"
+                                                    @click="open(@js($course->id))">
+                                                Ver
                                             </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="py-8 text-center text-gray-500">
-                                        No hay cursos aún.
-                                    </td>
-                                </tr>
-                            @endforelse
+
+                                            <a href="{{ route('courses.edit', $course) }}"
+                                            class="ml-3 text-indigo-600 hover:text-indigo-900 font-medium">
+                                                Editar
+                                            </a>
+
+                                            <form action="{{ route('courses.destroy', $course) }}"
+                                                method="POST"
+                                                class="inline"
+                                                onsubmit="return confirm('¿Eliminar este curso?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="ml-3 text-red-600 hover:text-red-800 font-medium">
+                                                    Eliminar
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="py-8 text-center text-gray-500">
+                                            No hay cursos aún.
+                                        </td>
+                                    </tr>
+                                @endforelse
+
                             </tbody>
                         </table>
                     </div>
@@ -124,7 +160,7 @@
             <div class="absolute inset-0 bg-black/40" @click="close()"></div>
 
             {{-- Panel --}}
-            <div class="relative w-full max-w-4xl mx-4 bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="relative w-full  mx-4 bg-white rounded-lg shadow-lg overflow-hidden">
                 <div class="max-h-[85vh] overflow-y-auto">
                     <template x-if="selectedId !== null">
                         <div>

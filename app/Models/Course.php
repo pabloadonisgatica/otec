@@ -6,23 +6,31 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Budget;
+
+
 
 class Course extends Model
 {
     protected $fillable = [
-        // relaciones base
+        // relaciones base (empresa ahora puede ser nullable, se define en ejecución)
         'company_id',
+
+        // nuevos
+        'folio',
+        'course_type', // sence | licitacion | privado
 
         // identificación
         'name',
         'sence_code',
         'activity_type',
-        'instruction_modality',
+
+        // modalidad múltiple
+        'instruction_modalities', // json array
 
         // reglas / números
         'attendance_percentage',
         'min_grade',
-        'min_hours',
         'participants_count',
 
         // fechas / estado
@@ -37,24 +45,28 @@ class Course extends Model
         'teaching_methodology',
         'notes',
 
-        // costos / vigencia
+        // costos / SENCE
         'value_per_participant',
-        'sence_request_date',
-        'sence_expiration_date',
+        'sence_approval_date', // para calcular caducidad (+4 años) solo informativo
 
-        // diploma futuro / totales
-        'diploma_id',
+        // totales
         'hours',
+
+        // diploma futuro
+        'diploma_id',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
-        'sence_request_date' => 'date',
-        'sence_expiration_date' => 'date',
+        'sence_approval_date' => 'date',
+
+        'instruction_modalities' => 'array',
 
         'attendance_percentage' => 'decimal:2',
         'min_grade' => 'decimal:2',
+        'hours' => 'decimal:2',
+
         'value_per_participant' => 'integer',
         'participants_count' => 'integer',
     ];
@@ -64,6 +76,8 @@ class Course extends Model
         return $this->belongsTo(Company::class);
     }
 
+    // OJO: relatores ya NO se seleccionan en curso (se seleccionan en ejecución)
+    // La relación puede quedarse por compatibilidad, pero luego la moveremos a Ejecución.
     public function instructors(): BelongsToMany
     {
         return $this->belongsToMany(Instructor::class)
@@ -82,4 +96,9 @@ class Course extends Model
     {
         return $this->hasMany(CourseContent::class)->orderBy('sort_order');
     }
+    public function budgets(): BelongsToMany
+{
+    return $this->belongsToMany(Budget::class, 'budget_courses')->withTimestamps();
+}
+
 }

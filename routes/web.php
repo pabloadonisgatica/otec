@@ -7,6 +7,7 @@ use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\BudgetController;
 
 
 
@@ -33,6 +34,16 @@ Route::middleware('auth')->group(function () {
     Route::post('participants/import', [ParticipantController::class, 'import'])->name('participants.import');
     Route::resource('participants', ParticipantController::class);
     Route::resource('courses', CourseController::class);
+    Route::middleware(['auth'])->group(function () {
+    Route::resource('budgets', BudgetController::class);
+
+    // Acciones extra
+    Route::post('budgets/{budget}/duplicate', [BudgetController::class, 'duplicate'])
+        ->name('budgets.duplicate');
+
+    Route::get('budgets/{budget}/pdf', [BudgetController::class, 'pdf'])
+        ->name('budgets.pdf');
+});
    
 
 
