@@ -33,3 +33,5 @@ yarn-error.log
 /.zed
 
 .vemto_settings
+.vemto/
+.vemto_settings.example

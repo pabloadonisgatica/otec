@@ -52,7 +52,7 @@
                             <div class="text-sm text-gray-600">Plantilla y emisión con QR</div>
                         </a>
 
-                        <a href="#" class="block p-4 border rounded-lg hover:bg-gray-50">
+                        <a href="/configuracion" class="block p-4 border rounded-lg hover:bg-gray-50">
                             <div class="font-semibold">Configuración</div>
                             <div class="text-sm text-gray-600">Datos OTEC y usuarios</div>
                         </a>

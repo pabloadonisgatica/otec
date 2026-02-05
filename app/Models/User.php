@@ -9,7 +9,6 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -21,6 +20,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'permissions',
     ];
 
     /**
@@ -34,15 +35,34 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * The attributes that should be cast.
      */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'permissions' => 'array',
         ];
+    }
+
+    /**
+     * Helpers de roles / permisos
+     */
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        $perms = $this->permissions ?? [];
+
+        return in_array($permission, $perms, true);
     }
 }

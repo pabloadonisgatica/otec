@@ -8,6 +8,8 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\UserManagementController;
 
 
 
@@ -36,6 +38,20 @@ Route::middleware('auth')->group(function () {
     Route::resource('courses', CourseController::class);
     Route::middleware(['auth'])->group(function () {
     Route::resource('budgets', BudgetController::class);
+    Route::middleware(['auth'])->group(function () {
+    Route::get('/configuracion', [SettingsController::class, 'index'])->name('settings.index');});
+    Route::post('/configuracion/logo', [SettingsController::class, 'updateLogo'])
+    ->name('settings.logo.update');
+
+
+Route::prefix('configuracion')->middleware(['auth'])->group(function () {
+    Route::get('/usuarios', [UserManagementController::class, 'index'])->name('settings.users.index');
+    Route::get('/usuarios/crear', [UserManagementController::class, 'create'])->name('settings.users.create');
+    Route::post('/usuarios', [UserManagementController::class, 'store'])->name('settings.users.store');
+    Route::get('/usuarios/{user}/editar', [UserManagementController::class, 'edit'])->name('settings.users.edit');
+    Route::put('/usuarios/{user}', [UserManagementController::class, 'update'])->name('settings.users.update');
+});
+
 
     // Acciones extra
     Route::post('budgets/{budget}/duplicate', [BudgetController::class, 'duplicate'])

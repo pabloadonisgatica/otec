@@ -30,6 +30,9 @@
                     <x-nav-link :href="route('budgets.index')" :active="request()->routeIs('budgets.*')">
                         {{ __('Presupuestos') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.*')">
+                        {{ __('Configuración') }}
+                    </x-nav-link>
                 </div>
             </div>
 
