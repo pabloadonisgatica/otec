@@ -10,6 +10,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\DiplomaTemplateController;
 
 
 
@@ -60,7 +61,11 @@ Route::prefix('configuracion')->middleware(['auth'])->group(function () {
     Route::get('budgets/{budget}/pdf', [BudgetController::class, 'pdf'])
         ->name('budgets.pdf');
 });
-   
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('diploma-templates', DiplomaTemplateController::class);
+});
 
 
 });
