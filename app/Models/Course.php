@@ -10,6 +10,7 @@ use App\Models\Budget;
 
 
 
+
 class Course extends Model
 {
     protected $fillable = [
@@ -99,6 +100,10 @@ class Course extends Model
     public function budgets(): BelongsToMany
 {
     return $this->belongsToMany(Budget::class, 'budget_courses')->withTimestamps();
+}
+public function diplomas(): HasMany
+{
+    return $this->hasMany(Diploma::class);
 }
 
 }
