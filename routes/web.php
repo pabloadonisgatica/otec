@@ -11,6 +11,7 @@ use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\DiplomaTemplateController;
+use App\Http\Controllers\DiplomaController;
 
 
 
@@ -66,6 +67,11 @@ Route::prefix('configuracion')->middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::resource('diploma-templates', DiplomaTemplateController::class);
 });
+
+
+Route::get('diplomas', [DiplomaController::class, 'index'])->name('diplomas.index');
+Route::get('diplomas/emit', [DiplomaController::class, 'create'])->name('diplomas.create');
+Route::post('diplomas/emit', [DiplomaController::class, 'store'])->name('diplomas.store');
 
 
 });

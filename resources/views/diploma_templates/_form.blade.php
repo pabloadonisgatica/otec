@@ -41,9 +41,12 @@
                   required>{{ old('content_html', $template->content_html) }}</textarea>
         @error('content_html') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
 
-        <p class="mt-2 text-xs text-gray-500">
-            Por ahora guardamos HTML con placeholders (ej: <code>{{'{{participant.full_name}}'}}</code>).
-        </p>
+      <p class="mt-2 text-xs text-gray-500">
+    @verbatim
+        Por ahora guardamos HTML con placeholders (ej: <code>{{participant.full_name}}</code>).
+    @endverbatim
+</p>
+
     </div>
 </div>
 
