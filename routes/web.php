@@ -12,6 +12,9 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\DiplomaTemplateController;
 use App\Http\Controllers\DiplomaController;
+use App\Http\Controllers\ExecutionController;
+
+
 
 
 
@@ -73,7 +76,7 @@ Route::get('diplomas', [DiplomaController::class, 'index'])->name('diplomas.inde
 Route::get('diplomas/emit', [DiplomaController::class, 'create'])->name('diplomas.create');
 Route::post('diplomas/emit', [DiplomaController::class, 'store'])->name('diplomas.store');
 
-
+Route::resource('executions', ExecutionController::class);
 });
 
 

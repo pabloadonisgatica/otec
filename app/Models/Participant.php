@@ -24,9 +24,14 @@ class Participant extends Model
         return $this->belongsTo(Company::class);
     }
     public function diplomas(): HasMany
-{
-    return $this->hasMany(Diploma::class);
-}
+    {
+        return $this->hasMany(Diploma::class);
+    }
+    public function executions()
+    {
+        return $this->belongsToMany(Execution::class)
+                    ->withTimestamps();
+    }
 
 }
 

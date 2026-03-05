@@ -18,4 +18,9 @@ class Instructor extends Model
 protected $casts = [
     'documents' => 'array',
 ];
+public function executions()
+{
+    return $this->belongsToMany(Execution::class)
+                ->withTimestamps();
+}
 }
