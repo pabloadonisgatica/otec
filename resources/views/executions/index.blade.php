@@ -17,12 +17,6 @@
 
             <x-breadcrumb :items="$breadcrumbs ?? []" />
 
-            @if (session('status'))
-                <div class="mb-4 p-3 rounded bg-green-50 text-green-700">
-                    {{ session('status') }}
-                </div>
-            @endif
-
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="p-6">
 
@@ -35,7 +29,6 @@
                                     <th class="py-2 pr-4">Modalidad</th>
                                     <th class="py-2 pr-4">Inicio</th>
                                     <th class="py-2 pr-4">Estado</th>
-                                    <th class="py-2 pr-4">Tipo</th>
                                     <th class="py-2 pr-4 text-right">Participantes</th>
                                     <th class="py-2 pr-4 text-right">Acciones</th>
                                 </tr>
@@ -76,11 +69,6 @@
                                         <td class="py-3 pr-4">
                                             <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700">
                                                 {{ ucfirst(str_replace('_',' ',$execution->status)) }}
-                                            </span>
-                                        </td>
-                                        <td class="py-3 pr-4">
-                                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700">
-                                                {{ ucfirst($execution->type) }}
                                             </span>
                                         </td>
                                         {{-- Participantes --}}

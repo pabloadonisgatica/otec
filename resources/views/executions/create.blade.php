@@ -25,7 +25,7 @@
                                     Tipo
                                 </label>
                                 <select name="type"
-                                        class="w-full border-gray-300 rounded-md shadow-sm">
+                                    class="w-full border-gray-300 rounded-md shadow-sm">
                                     <option value="cerrado">Cerrado</option>
                                     <option value="abierto">Abierto</option>
                                 </select>
@@ -36,16 +36,39 @@
                                     Curso
                                 </label>
                                 <select name="course_id"
-                                        class="w-full border-gray-300 rounded-md shadow-sm">
+                                    class="w-full border-gray-300 rounded-md shadow-sm">
                                     <option value="">Seleccione curso</option>
-                                   @foreach($courses as $course)
-                                        <option value="{{ $course->id }}"
+                                    @foreach($courses as $course)
+                                    <option value="{{ $course->id }}"
                                         data-modalities='@json($course->instruction_modalities ?? [])'
                                         data-hours="{{ $course->hours ?? '' }}">
                                         {{ $course->name }}
-                                        </option>
+                                    </option>
                                     @endforeach
                                 </select>
+                            </div>
+                            {{-- Participantes --}}
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Participantes
+                                </label>
+
+                                <select name="participants[]"
+                                    multiple
+                                    class="w-full border-gray-300 rounded-md shadow-sm h-56">
+
+                                    @foreach($participants as $participant)
+                                    <option value="{{ $participant->id }}">
+                                        {{ $participant->first_name }}
+                                        {{ $participant->last_name }}
+                                    </option>
+                                    @endforeach
+
+                                </select>
+
+                                <p class="mt-1 text-xs text-gray-500">
+                                    Mantén presionado Ctrl (o Cmd en Mac) para seleccionar múltiples participantes.
+                                </p>
                             </div>
                             {{-- Modalidad (readonly) --}}
                             <div>
@@ -67,6 +90,7 @@
                                     id="hours_display"
                                     class="w-full border-gray-300 rounded-md shadow-sm bg-gray-100"
                                     readonly>
+                                
                             </div>
 
                             {{-- Empresa --}}
@@ -75,11 +99,11 @@
                                     Empresa
                                 </label>
                                 <select name="company_id"
-                                        class="w-full border-gray-300 rounded-md shadow-sm">
+                                    class="w-full border-gray-300 rounded-md shadow-sm">
                                     <option value="">Seleccione empresa</option>
                                     @foreach($companies as $company)
                                     <option value="{{ $company->id }}">
-                                    {{ $company->name }}
+                                        {{ $company->name }}
                                     </option>
                                     @endforeach
                                 </select>
@@ -91,7 +115,7 @@
                                     Tipo de evaluación
                                 </label>
                                 <select name="evaluation_type"
-                                        class="w-full border-gray-300 rounded-md shadow-sm">
+                                    class="w-full border-gray-300 rounded-md shadow-sm">
                                     <option value="percentage">Porcentaje</option>
                                     <option value="grade">Nota</option>
                                 </select>
@@ -103,8 +127,31 @@
                                     Fecha inicio
                                 </label>
                                 <input type="date"
-                                       name="start_date"
-                                       class="w-full border-gray-300 rounded-md shadow-sm">
+                                    name="start_date"
+                                    class="w-full border-gray-300 rounded-md shadow-sm">
+                            </div>
+                            {{-- Horas por día --}}
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Horas por día
+                                </label>
+
+                                <input
+                                    type="number"
+                                    name="hours_per_day"
+                                    min="1"
+                                    max="12"
+                                    step="0.5"
+                                    value="8"
+                                    class="w-full border-gray-300 rounded-md shadow-sm">
+                            </div>
+
+                            {{-- Jornada --}}
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Jornada
+                                </label>
+
                             </div>
 
                         </div>
@@ -115,19 +162,19 @@
                                 Observaciones
                             </label>
                             <textarea name="observations"
-                                      rows="3"
-                                      class="w-full border-gray-300 rounded-md shadow-sm"></textarea>
+                                rows="3"
+                                class="w-full border-gray-300 rounded-md shadow-sm"></textarea>
                         </div>
 
                         {{-- Botones --}}
                         <div class="mt-6 flex justify-end">
                             <a href="{{ route('executions.index') }}"
-                               class="mr-3 px-4 py-2 text-sm text-gray-600 hover:text-gray-800">
+                                class="mr-3 px-4 py-2 text-sm text-gray-600 hover:text-gray-800">
                                 Cancelar
                             </a>
 
                             <button type="submit"
-                                    class="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-semibold hover:bg-indigo-500">
+                                class="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-semibold hover:bg-indigo-500">
                                 Guardar ejecución
                             </button>
                         </div>
@@ -139,44 +186,45 @@
 
         </div>
     </div>
-<script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
 
-document.addEventListener("DOMContentLoaded", function(){
+            const select = document.querySelector('[name="course_id"]');
+            const modality = document.getElementById('modality_display');
+            const hours = document.getElementById('hours_display');
 
-const select = document.querySelector('[name="course_id"]');
-const modality = document.getElementById('modality_display');
-const hours = document.getElementById('hours_display');
+            if (!select) return;
 
-if(!select) return;
+            select.addEventListener("change", function() {
 
-select.addEventListener("change", function(){
+                const opt = this.options[this.selectedIndex];
 
-const opt = this.options[this.selectedIndex];
+                let modalities = [];
 
-let modalities = [];
+                try {
+                    modalities = JSON.parse(opt.dataset.modalities || "[]");
+                } catch (e) {
+                    modalities = [];
+                }
 
-try{
-modalities = JSON.parse(opt.dataset.modalities || "[]");
-}catch(e){
-modalities = [];
-}
+                /* mapa para nombres bonitos */
+                const labels = {
+                    presencial: "Presencial",
+                    elearning_sync: "E-learning Sync",
+                    elearning_async: "E-learning Async",
+                    distance_self: "Autoaprendizaje"
+                };
 
-/* mapa para nombres bonitos */
-const labels = {
-presencial: "Presencial",
-elearning_sync: "E-learning Sync",
-elearning_async: "E-learning Async",
-distance_self: "Autoaprendizaje"
-};
+                const formatted = modalities.map(m => labels[m] ?? m);
 
-const formatted = modalities.map(m => labels[m] ?? m);
+                modality.value = formatted.join(" · ");
+                hours.value = opt.dataset.hours ?? '';
 
-modality.value = formatted.join(" · ");
-hours.value = opt.dataset.hours ?? '';
+              
+                
 
-});
+            });
 
-});
-
-</script>
+        });
+    </script>
 </x-app-layout>

@@ -72,6 +72,27 @@
                                 Guardar logo
                             </button>
                         </form>
+
+                        <form class="mt-8 pt-8 border-t border-gray-200 space-y-4" action="{{ route('settings.otec-name.update') }}" method="POST">
+                            @csrf
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Nombre de la OTEC</label>
+                                <input type="text" name="otec_name"
+                                       value="{{ old('otec_name', \App\Models\AppSetting::get('otec_name')) }}"
+                                       placeholder="Ej: Proyecto Humano Capacitación Limitada"
+                                       class="mt-2 block w-full rounded-md border-gray-300 shadow-sm" />
+                                @error('otec_name')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                                <p class="mt-2 text-xs text-gray-500">Aparece en documentos generados, como el Libro de Control de Clases.</p>
+                            </div>
+
+                            <button type="submit"
+                                    class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700">
+                                Guardar nombre
+                            </button>
+                        </form>
                     </div>
 
                     {{-- TAB: Usuarios --}}

@@ -45,4 +45,18 @@ class SettingsController extends Controller
         return back()->with('status', 'Logo actualizado correctamente.');
     }
 
+    public function updateOtecName(Request $request)
+    {
+        $request->validate([
+            'otec_name' => ['required', 'string', 'max:255'],
+        ]);
+
+        AppSetting::updateOrCreate(
+            ['key' => 'otec_name'],
+            ['value' => $request->string('otec_name')]
+        );
+
+        return back()->with('status', 'Nombre de la OTEC actualizado correctamente.');
+    }
+
 }

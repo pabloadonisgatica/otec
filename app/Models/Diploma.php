@@ -9,6 +9,7 @@ class Diploma extends Model
 {
     protected $fillable = [
         'template_id',
+        'execution_id',
         'course_id',
         'participant_id',
         'code',
@@ -25,6 +26,11 @@ class Diploma extends Model
     public function template(): BelongsTo
     {
         return $this->belongsTo(DiplomaTemplate::class, 'template_id');
+    }
+
+    public function execution(): BelongsTo
+    {
+        return $this->belongsTo(Execution::class);
     }
 
     public function course(): BelongsTo

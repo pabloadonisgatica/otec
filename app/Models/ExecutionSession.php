@@ -8,6 +8,7 @@ class ExecutionSession extends Model
 {
     protected $fillable = [
         'execution_id',
+        'instructor_id',
         'session_date',
         'start_time',
         'end_time',
@@ -17,5 +18,15 @@ class ExecutionSession extends Model
     public function execution()
     {
         return $this->belongsTo(Execution::class);
+    }
+
+    public function instructor()
+    {
+        return $this->belongsTo(Instructor::class);
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
     }
 }

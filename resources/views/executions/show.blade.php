@@ -5,107 +5,201 @@
                 Ejecución {{ $execution->internal_code }}
             </h2>
 
-            <a href="{{ route('executions.edit', $execution) }}"
-               class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500">
-                Editar
-            </a>
+            <div class="flex items-center gap-3">
+
+                @if(in_array($execution->status, ['planificada', 'en_ejecucion']))
+
+                    @php
+                        $sessionsWithoutAttendance = $execution->sessions->filter(
+                            fn ($session) => $session->attendances->isEmpty()
+                        )->count();
+
+                        $hoursIncomplete = $planningValidation['status'] !== 'complete';
+
+                        $closeWarnings = [];
+
+                        if ($hoursIncomplete) {
+                            $closeWarnings[] = 'las horas planificadas no están completas';
+                        }
+
+                        if ($sessionsWithoutAttendance > 0) {
+                            $closeWarnings[] = $sessionsWithoutAttendance . ' sesión(es) sin asistencia registrada';
+                        }
+
+                        $closeConfirmMessage = $closeWarnings
+                            ? 'Atención: ' . implode(' y ', $closeWarnings) . '. ¿Cerrar la ejecución de todas formas?'
+                            : '¿Cerrar esta ejecución?';
+                    @endphp
+
+                    <form
+                        method="POST"
+                        action="{{ route('executions.close', $execution) }}"
+                        onsubmit="return confirm('{{ $closeConfirmMessage }}')">
+
+                        @csrf
+                        @method('PUT')
+
+                        <button
+                            type="submit"
+                            class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
+
+                            Cerrar ejecución
+
+                        </button>
+
+                    </form>
+
+                @elseif($execution->status === 'finalizada')
+
+                    <form
+                        method="POST"
+                        action="{{ route('executions.reopen', $execution) }}"
+                        onsubmit="return confirm('¿Reabrir esta ejecución para poder editarla?')">
+
+                        @csrf
+                        @method('PUT')
+
+                        <button
+                            type="submit"
+                            class="inline-flex items-center px-4 py-2 bg-amber-50 border border-amber-300 rounded-md font-semibold text-xs text-amber-700 uppercase tracking-widest hover:bg-amber-100">
+
+                            Reabrir ejecución
+
+                        </button>
+
+                    </form>
+
+                @endif
+
+                <a href="{{ route('executions.edit', $execution) }}"
+                    class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500">
+                    Editar
+                </a>
+
+            </div>
         </div>
     </x-slot>
-
     <div class="py-6">
-        <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             <x-breadcrumb :items="$breadcrumbs" />
- {{-- Resumen adicional --}}
-            <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="border-b border-gray-200 mb-6">
 
-                {{-- Participantes --}}
-                <div class="bg-white shadow-sm sm:rounded-lg p-6 text-center">
-                    <div class="text-gray-500 text-sm">Participantes</div>
-                    <div class="text-2xl font-bold text-gray-900">
-                        {{ $execution->participants->count() }}
-                    </div>
-                </div>
+                <nav class="flex gap-8">
 
-                {{-- Relatores --}}
-                <div class="bg-white shadow-sm sm:rounded-lg p-6 text-center">
-                    <div class="text-gray-500 text-sm">Relatores</div>
-                    <div class="text-2xl font-bold text-gray-900">
-                        {{ $execution->instructors->count() }}
-                    </div>
-                </div>
+                    <a href="{{ route('executions.show', [$execution, 'tab' => 'general']) }}"
+                        class="py-3 border-b-2 {{ $tab == 'general'
+                ? 'border-indigo-600 text-indigo-600 font-semibold'
+                : 'border-transparent text-gray-500 hover:text-gray-700' }}">
 
-                {{-- Horas programadas --}}
-                <div class="bg-white shadow-sm sm:rounded-lg p-6 text-center">
-                    <div class="text-gray-500 text-sm">Horas programadas</div>
-                    <div class="text-2xl font-bold text-gray-900">
-                        {{ $execution->sessions->sum('hours') }}
-                    </div>
-                </div>
+                        Información
+
+                    </a>
+
+                    <a href="{{ route('executions.show', [$execution, 'tab' => 'planning']) }}"
+                        class="py-3 border-b-2 {{ $tab == 'planning'
+                ? 'border-indigo-600 text-indigo-600 font-semibold'
+                : 'border-transparent text-gray-500 hover:text-gray-700' }}">
+
+                        Planificación
+
+                    </a>
+
+                    <a href="{{ route('executions.show', [$execution, 'tab' => 'sessions']) }}"
+                        class="py-3 border-b-2 {{ $tab == 'sessions'
+                ? 'border-indigo-600 text-indigo-600 font-semibold'
+                : 'border-transparent text-gray-500 hover:text-gray-700' }}">
+
+                        Agenda
+
+                    </a>
+
+                    <a href="{{ route('executions.show', [$execution, 'tab' => 'classbook']) }}"
+                        class="py-3 border-b-2 {{ $tab == 'classbook'
+                ? 'border-indigo-600 text-indigo-600 font-semibold'
+                : 'border-transparent text-gray-500 hover:text-gray-700' }}">
+
+                        Libro de clases
+
+                    </a>
+
+                    <a href="{{ route('executions.show', [$execution, 'tab' => 'survey']) }}"
+                        class="py-3 border-b-2 {{ $tab == 'survey'
+                ? 'border-indigo-600 text-indigo-600 font-semibold'
+                : 'border-transparent text-gray-500 hover:text-gray-700' }}">
+
+                        Encuesta
+
+                    </a>
+
+                    <a href="{{ route('executions.show', [$execution, 'tab' => 'participants']) }}"
+                        class="py-3 border-b-2 {{ $tab == 'participants'
+                ? 'border-indigo-600 text-indigo-600 font-semibold'
+                : 'border-transparent text-gray-500 hover:text-gray-700' }}">
+
+                        Participantes
+
+                    </a>
+
+                    <a href="{{ route('executions.show', [$execution, 'tab' => 'instructors']) }}"
+                        class="py-3 border-b-2 {{ $tab == 'instructors'
+                ? 'border-indigo-600 text-indigo-600 font-semibold'
+                : 'border-transparent text-gray-500 hover:text-gray-700' }}">
+
+                        Relatores
+
+                    </a>
+
+                </nav>
 
             </div>
-            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
-                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
 
-                    {{-- Curso --}}
-                    <div>
-                        <span class="text-gray-500">Curso</span>
-                        <div class="font-medium text-gray-900">
-                            {{ $execution->course_name }}
-                        </div>
-                    </div>
+            @if($tab == 'general')
 
-                    {{-- Empresa --}}
-                    <div>
-                        <span class="text-gray-500">Empresa</span>
-                        <div class="font-medium text-gray-900">
-                            {{ $execution->company->name ?? '—' }}
-                        </div>
-                    </div>
+            @include('executions.partials.summary')
 
-                    {{-- Modalidad --}}
-                    <div>
-                        <span class="text-gray-500">Modalidad</span>
-                        <div class="font-medium text-gray-900">
-                            {{ $execution->modality }}
-                        </div>
-                    </div>
+            @include('executions.partials.general')
 
-                    {{-- Fecha inicio --}}
-                    <div>
-                        <span class="text-gray-500">Fecha inicio</span>
-                        <div class="font-medium text-gray-900">
-                            {{ \Carbon\Carbon::parse($execution->start_date)->format('d-m-Y') }}
-                        </div>
-                    </div>
+            @endif
 
-                    {{-- Estado --}}
-                    <div>
-                        <span class="text-gray-500">Estado</span>
-                        <div class="font-medium text-gray-900">
-                            {{ ucfirst(str_replace('_',' ',$execution->status)) }}
-                        </div>
-                    </div>
+            @if($tab == 'planning')
 
-                    {{-- Tipo evaluación --}}
-                    <div>
-                        <span class="text-gray-500">Tipo evaluación</span>
-                        <div class="font-medium text-gray-900">
-                            {{ $execution->evaluation_type === 'percentage' ? 'Porcentaje' : 'Nota' }}
-                        </div>
-                    </div>
-                    {{-- Tipo --}}
-                    <div>
-                        <span class="text-gray-500">Tipo</span>
-                        <div class="font-medium text-gray-900">
-                            {{ ucfirst($execution->type) }}
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @include('executions.partials.planning')
 
-           
+            @endif
+
+            @if($tab == 'sessions')
+
+            @include('executions.partials.sessions')
+
+            @endif
+
+            @if($tab == 'classbook')
+
+            @include('executions.partials.classbook')
+
+            @endif
+
+            @if($tab == 'survey')
+
+            @include('executions.partials.survey')
+
+            @endif
+
+            @if($tab == 'participants')
+
+            @include('executions.partials.participants')
+
+            @endif
+
+            @if($tab == 'instructors')
+
+            @include('executions.partials.instructors')
+
+            @endif
 
         </div>
     </div>
+
+
 </x-app-layout>

@@ -29,6 +29,7 @@
 
             <!-- Page Content -->
             <main>
+                <x-ui.alert />
                 {{ $slot }}
             </main>
         </div>

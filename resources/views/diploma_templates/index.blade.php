@@ -3,10 +3,17 @@
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Plantillas de Diplomas</h2>
 
-            <a href="{{ route('diploma-templates.create') }}"
-               class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md text-xs font-semibold uppercase tracking-widest hover:bg-indigo-500">
-                Nueva plantilla
-            </a>
+            <div class="flex gap-2">
+                <a href="{{ route('diplomas.index') }}"
+                   class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md text-xs font-semibold uppercase tracking-widest hover:bg-gray-50">
+                    Diplomas emitidos
+                </a>
+
+                <a href="{{ route('diploma-templates.create') }}"
+                   class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md text-xs font-semibold uppercase tracking-widest hover:bg-indigo-500">
+                    Nueva plantilla
+                </a>
+            </div>
         </div>
     </x-slot>
 

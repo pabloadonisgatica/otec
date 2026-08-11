@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\DiplomaTemplate;
+use App\Services\DiplomaRenderer;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -112,5 +114,38 @@ class DiplomaTemplateController extends Controller
         return redirect()
             ->route('diploma-templates.index')
             ->with('status', 'Plantilla eliminada.');
+    }
+
+    /**
+     * Vista previa del HTML del formulario (sin necesidad de
+     * guardar), con datos de muestra.
+     */
+    public function preview(Request $request, DiplomaRenderer $diplomaRenderer)
+    {
+        $request->validate([
+            'content_html' => ['required', 'string'],
+        ]);
+
+        $content = $diplomaRenderer->renderPreview($request->input('content_html'));
+        $html = $diplomaRenderer->wrapDocument($content);
+
+        $pdf = Pdf::loadHTML($html)->setPaper('folio', 'landscape');
+
+        return $pdf->stream('vista-previa-diploma.pdf');
+    }
+
+    /**
+     * Igual que preview(), pero devuelve HTML plano en vez de
+     * PDF — para la vista previa en vivo dentro del editor.
+     */
+    public function previewHtml(Request $request, DiplomaRenderer $diplomaRenderer)
+    {
+        $request->validate([
+            'content_html' => ['required', 'string'],
+        ]);
+
+        return response(
+            $diplomaRenderer->renderPreview($request->input('content_html'))
+        );
     }
 }

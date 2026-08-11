@@ -20,5 +20,9 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('Admin123456!'),
             ]
         );
+
+        $this->call(HolidaySeeder::class);
+        $this->call(SurveyQuestionSeeder::class);
+        $this->call(DiplomaTemplateSeeder::class);
     }
 }

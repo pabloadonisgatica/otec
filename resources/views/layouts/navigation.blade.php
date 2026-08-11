@@ -30,6 +30,12 @@
                     <x-nav-link :href="route('budgets.index')" :active="request()->routeIs('budgets.*')">
                         {{ __('Presupuestos') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('executions.index')" :active="request()->routeIs('executions.*')">
+                         {{ __('Ejecuciones') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('diplomas.index')" :active="request()->routeIs('diplomas.*') || request()->routeIs('diploma-templates.*')">
+                        {{ __('Diplomas') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.*')">
                         {{ __('Configuración') }}
                     </x-nav-link>
@@ -102,6 +108,15 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('budgets.index')" :active="request()->routeIs('budgets.*')">
                 {{ __('Presupuestos') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('executions.index')" :active="request()->routeIs('executions.*')">
+                {{ __('Ejecuciones') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('diplomas.index')" :active="request()->routeIs('diplomas.*') || request()->routeIs('diploma-templates.*')">
+                {{ __('Diplomas') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.*')">
+                {{ __('Configuración') }}
             </x-responsive-nav-link>
         </div>
 
