@@ -107,6 +107,11 @@ class Execution extends Model
         return $this->hasMany(Diploma::class);
     }
 
+    public function nonConformities()
+    {
+        return $this->hasMany(NonConformity::class);
+    }
+
     public function participants()
     {
         return $this->belongsToMany(Participant::class)

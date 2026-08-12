@@ -19,6 +19,11 @@ use App\Http\Controllers\ClassBookController;
 use App\Http\Controllers\ExecutionSurveyController;
 use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\ExecutionPlanningController;
+use App\Http\Controllers\NonConformityController;
+use App\Http\Controllers\CorrectiveActionController;
+use App\Http\Controllers\ProviderController;
+use App\Http\Controllers\QualityNormController;
+use App\Http\Controllers\QualityProfileController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -330,6 +335,51 @@ Route::middleware('auth')->group(function () {
         '/executions/{execution}/survey/send',
         [ExecutionSurveyController::class, 'send']
     )->name('executions.survey.send');
+
+    /*
+|--------------------------------------------------------------------------
+| Gestión de Calidad — No Conformidades y Acciones
+|--------------------------------------------------------------------------
+*/
+
+    Route::prefix('calidad')->name('quality.')->group(function () {
+
+        Route::get('/norma', [QualityNormController::class, 'index'])
+            ->name('norm.index');
+
+        Route::get('/requisitos-generales', [QualityProfileController::class, 'edit'])
+            ->name('profile.edit');
+
+        Route::put('/requisitos-generales', [QualityProfileController::class, 'update'])
+            ->name('profile.update');
+
+        Route::resource('no-conformidades', NonConformityController::class)
+            ->parameters(['no-conformidades' => 'non_conformity'])
+            ->names('non-conformities');
+
+        Route::post(
+            '/no-conformidades/{non_conformity}/acciones',
+            [CorrectiveActionController::class, 'store']
+        )->name('non-conformities.actions.store');
+
+        Route::put(
+            '/no-conformidades/{non_conformity}/acciones/{action}',
+            [CorrectiveActionController::class, 'update']
+        )->name('non-conformities.actions.update');
+
+        Route::delete(
+            '/no-conformidades/{non_conformity}/acciones/{action}',
+            [CorrectiveActionController::class, 'destroy']
+        )->name('non-conformities.actions.destroy');
+
+        Route::get('/proveedores/{provider}/informe', [ProviderController::class, 'report'])
+            ->name('providers.report');
+
+        Route::resource('proveedores', ProviderController::class)
+            ->parameters(['proveedores' => 'provider'])
+            ->names('providers');
+
+    });
 });
 
 require __DIR__ . '/auth.php';

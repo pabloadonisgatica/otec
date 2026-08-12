@@ -36,6 +36,9 @@
                     <x-nav-link :href="route('diplomas.index')" :active="request()->routeIs('diplomas.*') || request()->routeIs('diploma-templates.*')">
                         {{ __('Diplomas') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('quality.norm.index')" :active="request()->routeIs('quality.*')">
+                        {{ __('Calidad') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.*')">
                         {{ __('Configuración') }}
                     </x-nav-link>
@@ -114,6 +117,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('diplomas.index')" :active="request()->routeIs('diplomas.*') || request()->routeIs('diploma-templates.*')">
                 {{ __('Diplomas') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('quality.norm.index')" :active="request()->routeIs('quality.*')">
+                {{ __('Calidad') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.*')">
                 {{ __('Configuración') }}
