@@ -39,17 +39,27 @@
                                         @endif
                                     </div>
 
-                                    @if($isLinked)
-                                        <a href="{{ route($item['route']) }}"
-                                           class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium
-                                               {{ $item['status'] === 'done' ? 'bg-green-50 text-green-700 hover:bg-green-100' : 'bg-amber-50 text-amber-700 hover:bg-amber-100' }}">
-                                            {{ $item['status'] === 'done' ? '🟢' : '🟡' }} Ver
-                                        </a>
-                                    @else
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-400">
-                                            ⚪ Pendiente
-                                        </span>
-                                    @endif
+                                    <div class="flex items-center gap-2">
+
+                                        @if(!empty($item['chip']))
+                                            <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full whitespace-nowrap">
+                                                {{ $item['chip'] }}
+                                            </span>
+                                        @endif
+
+                                        @if($isLinked)
+                                            <a href="{{ route($item['route']) }}"
+                                               class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap
+                                                   {{ $item['status'] === 'done' ? 'bg-green-50 text-green-700 hover:bg-green-100' : 'bg-amber-50 text-amber-700 hover:bg-amber-100' }}">
+                                                {{ $item['status'] === 'done' ? '🟢' : '🟡' }} Ver
+                                            </a>
+                                        @else
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-400 whitespace-nowrap">
+                                                ⚪ Pendiente
+                                            </span>
+                                        @endif
+
+                                    </div>
 
                                 </div>
 

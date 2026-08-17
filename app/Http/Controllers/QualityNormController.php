@@ -2,23 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\QualityProfile;
+
 class QualityNormController extends Controller
 {
     public function index()
     {
+        $profile = QualityProfile::current();
+
+        $lastAuditChip = $profile->last_audit_date
+            ? 'Última auditoría: ' . $profile->last_audit_date->format('d-m-Y')
+            : 'Sin auditoría registrada';
+
         $sections = [
             [
                 'title' => '4.1 Requisitos Generales',
                 'items' => [
-                    ['label' => 'Visión, Misión, Alcance, Última Auditoría, Documentación Legal', 'status' => 'done', 'route' => 'quality.profile.edit'],
-                    ['label' => 'Mapa de Procesos', 'status' => 'pending'],
-                    ['label' => 'Organigrama', 'status' => 'pending'],
+                    ['label' => 'Visión, Misión, Alcance, Última Auditoría, Documentación Legal', 'status' => 'done', 'route' => 'quality.profile.edit', 'chip' => $lastAuditChip],
+                    ['label' => 'Mapa de Procesos', 'status' => 'done', 'route' => 'quality.profile.edit'],
+                    ['label' => 'Organigrama', 'status' => 'done', 'route' => 'quality.profile.edit'],
                 ],
             ],
             [
                 'title' => '4.2 Requisitos de Documentación',
                 'items' => [
-                    ['label' => 'Manual de Calidad', 'status' => 'pending'],
+                    ['label' => 'Manual de Calidad', 'status' => 'done', 'route' => 'quality.manual-calidad'],
                     ['label' => 'Control de Documentos (Procedimientos)', 'status' => 'pending'],
                     ['label' => 'Listado de Documentos Externos', 'status' => 'pending'],
                     ['label' => 'Control de Registros', 'status' => 'pending'],

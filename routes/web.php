@@ -24,6 +24,7 @@ use App\Http\Controllers\CorrectiveActionController;
 use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\QualityNormController;
 use App\Http\Controllers\QualityProfileController;
+use App\Http\Controllers\QualityDocumentController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -352,6 +353,33 @@ Route::middleware('auth')->group(function () {
 
         Route::put('/requisitos-generales', [QualityProfileController::class, 'update'])
             ->name('profile.update');
+
+        Route::post('/requisitos-generales/documentos', [QualityProfileController::class, 'uploadDocument'])
+            ->name('profile.documents.upload');
+
+        Route::get('/requisitos-generales/documentos/{index}/descargar', [QualityProfileController::class, 'downloadDocument'])
+            ->name('profile.documents.download');
+
+        Route::delete('/requisitos-generales/documentos/{index}', [QualityProfileController::class, 'deleteDocument'])
+            ->name('profile.documents.delete');
+
+        Route::post('/requisitos-generales/mapa-procesos', [QualityProfileController::class, 'uploadProcessMap'])
+            ->name('profile.process-map.upload');
+
+        Route::post('/requisitos-generales/organigrama', [QualityProfileController::class, 'uploadOrgChart'])
+            ->name('profile.org-chart.upload');
+
+        Route::get('/manual-calidad', [QualityDocumentController::class, 'manualCalidad'])
+            ->name('manual-calidad');
+
+        Route::put('/manual-calidad', [QualityDocumentController::class, 'updateManualCalidad'])
+            ->name('manual-calidad.update');
+
+        Route::post('/manual-calidad/versiones', [QualityDocumentController::class, 'uploadVersion'])
+            ->name('manual-calidad.versions.upload');
+
+        Route::get('/manual-calidad/versiones/{version}/descargar', [QualityDocumentController::class, 'downloadVersion'])
+            ->name('manual-calidad.versions.download');
 
         Route::resource('no-conformidades', NonConformityController::class)
             ->parameters(['no-conformidades' => 'non_conformity'])

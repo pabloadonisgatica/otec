@@ -12,10 +12,16 @@ class QualityProfile extends Model
         'scope',
         'last_audit_date',
         'legal_documentation',
+        'legal_documents',
+        'process_map_title',
+        'process_map_path',
+        'org_chart_title',
+        'org_chart_path',
     ];
 
     protected $casts = [
         'last_audit_date' => 'date',
+        'legal_documents' => 'array',
     ];
 
     /**
