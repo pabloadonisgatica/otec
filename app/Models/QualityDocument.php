@@ -10,6 +10,7 @@ class QualityDocument extends Model
         'type',
         'code',
         'name',
+        'description',
         'reviewer_name',
         'review_date',
         'approver_name',

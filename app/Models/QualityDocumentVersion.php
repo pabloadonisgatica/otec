@@ -11,6 +11,7 @@ class QualityDocumentVersion extends Model
         'version_number',
         'file_path',
         'file_name',
+        'external_url',
         'observation',
         'uploaded_by',
         'uploaded_at',
@@ -19,6 +20,11 @@ class QualityDocumentVersion extends Model
     protected $casts = [
         'uploaded_at' => 'datetime',
     ];
+
+    public function isExternalLink(): bool
+    {
+        return !empty($this->external_url) && empty($this->file_path);
+    }
 
     public function document()
     {

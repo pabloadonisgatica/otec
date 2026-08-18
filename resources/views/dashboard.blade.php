@@ -12,50 +12,79 @@
                     <p class="text-lg font-semibold mb-4">Módulos</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <a href="/companies" class="block p-4 border rounded-lg hover:bg-gray-50">
-                            <div class="font-semibold">Empresas</div>
-                            <div class="text-sm text-gray-600">Crear, editar y listar empresas</div>
+
+                        <a href="{{ route('companies.index') }}" class="flex items-start gap-3 p-4 border rounded-lg hover:bg-gray-50">
+                            <x-icon name="building" class="w-6 h-6 text-indigo-600 shrink-0" />
+                            <div>
+                                <div class="font-semibold">Empresas</div>
+                                <div class="text-sm text-gray-600">Crear, editar y listar empresas</div>
+                            </div>
                         </a>
 
-                        <a href="#" class="block p-4 border rounded-lg hover:bg-gray-50">
-                            <div class="font-semibold">Presupuestos</div>
-                            <div class="text-sm text-gray-600">Crear y administrar presupuestos</div>
+                        <a href="{{ route('budgets.index') }}" class="flex items-start gap-3 p-4 border rounded-lg hover:bg-gray-50">
+                            <x-icon name="currency" class="w-6 h-6 text-indigo-600 shrink-0" />
+                            <div>
+                                <div class="font-semibold">Presupuestos</div>
+                                <div class="text-sm text-gray-600">Crear y administrar presupuestos</div>
+                            </div>
                         </a>
 
-                        <a href="/courses" class="block p-4 border rounded-lg hover:bg-gray-50">
-                            <div class="font-semibold">Cursos</div>
-                            <div class="text-sm text-gray-600">Gestión de cursos y fechas</div>
+                        <a href="{{ route('courses.index') }}" class="flex items-start gap-3 p-4 border rounded-lg hover:bg-gray-50">
+                            <x-icon name="book-open" class="w-6 h-6 text-indigo-600 shrink-0" />
+                            <div>
+                                <div class="font-semibold">Cursos</div>
+                                <div class="text-sm text-gray-600">Gestión de cursos y fechas</div>
+                            </div>
                         </a>
 
-                        <a href="/instructors" class="block p-4 border rounded-lg hover:bg-gray-50">
-                            <div class="font-semibold">Relatores</div>
-                            <div class="text-sm text-gray-600">Registro y documentos</div>
+                        <a href="{{ route('instructors.index') }}" class="flex items-start gap-3 p-4 border rounded-lg hover:bg-gray-50">
+                            <x-icon name="academic-cap" class="w-6 h-6 text-indigo-600 shrink-0" />
+                            <div>
+                                <div class="font-semibold">Relatores</div>
+                                <div class="text-sm text-gray-600">Registro y documentos</div>
+                            </div>
                         </a>
 
-                        <a href="/participants" class="block p-4 border rounded-lg hover:bg-gray-50">
-                            <div class="font-semibold">Participantes</div>
-                            <div class="text-sm text-gray-600">Registro y listado</div>
+                        <a href="{{ route('participants.index') }}" class="flex items-start gap-3 p-4 border rounded-lg hover:bg-gray-50">
+                            <x-icon name="users" class="w-6 h-6 text-indigo-600 shrink-0" />
+                            <div>
+                                <div class="font-semibold">Participantes</div>
+                                <div class="text-sm text-gray-600">Registro y listado</div>
+                            </div>
                         </a>
 
-                        <a href="#" class="block p-4 border rounded-lg hover:bg-gray-50">
-                            <div class="font-semibold">Libro de Clases</div>
-                            <div class="text-sm text-gray-600">Asistencia y observaciones</div>
+                        <a href="{{ route('executions.index') }}" class="flex items-start gap-3 p-4 border rounded-lg hover:bg-gray-50">
+                            <x-icon name="calendar-check" class="w-6 h-6 text-indigo-600 shrink-0" />
+                            <div>
+                                <div class="font-semibold">Ejecuciones</div>
+                                <div class="text-sm text-gray-600">Planificación, agenda, asistencia y libro de clases</div>
+                            </div>
                         </a>
 
-                        <a href="#" class="block p-4 border rounded-lg hover:bg-gray-50">
-                            <div class="font-semibold">Gestión de Calidad</div>
-                            <div class="text-sm text-gray-600">NCH 2728, encuestas y no conformidades</div>
+                        <a href="{{ route('quality.norm.index') }}" class="flex items-start gap-3 p-4 border rounded-lg hover:bg-gray-50">
+                            <x-icon name="shield-check" class="w-6 h-6 text-indigo-600 shrink-0" />
+                            <div>
+                                <div class="font-semibold">Gestión de Calidad</div>
+                                <div class="text-sm text-gray-600">NCH 2728, encuestas y no conformidades</div>
+                            </div>
                         </a>
 
-                        <a href="#" class="block p-4 border rounded-lg hover:bg-gray-50">
-                            <div class="font-semibold">Diplomas</div>
-                            <div class="text-sm text-gray-600">Plantilla y emisión con QR</div>
+                        <a href="{{ route('diplomas.index') }}" class="flex items-start gap-3 p-4 border rounded-lg hover:bg-gray-50">
+                            <x-icon name="certificate" class="w-6 h-6 text-indigo-600 shrink-0" />
+                            <div>
+                                <div class="font-semibold">Diplomas</div>
+                                <div class="text-sm text-gray-600">Plantilla y emisión con QR</div>
+                            </div>
                         </a>
 
-                        <a href="/configuracion" class="block p-4 border rounded-lg hover:bg-gray-50">
-                            <div class="font-semibold">Configuración</div>
-                            <div class="text-sm text-gray-600">Datos OTEC y usuarios</div>
+                        <a href="{{ route('settings.index') }}" class="flex items-start gap-3 p-4 border rounded-lg hover:bg-gray-50">
+                            <x-icon name="cog" class="w-6 h-6 text-indigo-600 shrink-0" />
+                            <div>
+                                <div class="font-semibold">Configuración</div>
+                                <div class="text-sm text-gray-600">Datos OTEC y usuarios</div>
+                            </div>
                         </a>
+
                     </div>
 
                     <div class="mt-6 text-sm text-gray-500">

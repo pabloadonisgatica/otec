@@ -27,9 +27,9 @@ class QualityNormController extends Controller
                 'title' => '4.2 Requisitos de Documentación',
                 'items' => [
                     ['label' => 'Manual de Calidad', 'status' => 'done', 'route' => 'quality.manual-calidad'],
-                    ['label' => 'Control de Documentos (Procedimientos)', 'status' => 'pending'],
-                    ['label' => 'Listado de Documentos Externos', 'status' => 'pending'],
-                    ['label' => 'Control de Registros', 'status' => 'pending'],
+                    ['label' => 'Control de Documentos (Procedimientos)', 'status' => 'done', 'route' => 'quality.procedures.index'],
+                    ['label' => 'Listado de Documentos Externos', 'status' => 'done', 'route' => 'quality.external-documents.index'],
+                    ['label' => 'Control de Registros', 'status' => 'done', 'route' => 'quality.records.index'],
                 ],
             ],
             [

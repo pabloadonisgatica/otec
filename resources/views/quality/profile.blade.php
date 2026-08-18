@@ -6,7 +6,10 @@
     <div class="py-6">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
 
-            @include('quality._nav')
+            <x-breadcrumb :items="[
+                ['label' => 'Ver Norma', 'url' => route('quality.norm.index')],
+                ['label' => 'Requisitos Generales'],
+            ]" />
 
             @if (session('status'))
                 <div class="mb-4 p-3 rounded bg-green-50 text-green-700">

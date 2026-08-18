@@ -6,7 +6,10 @@
     <div class="py-6">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
 
-            @include('quality._nav')
+            <x-breadcrumb :items="[
+                ['label' => 'Ver Norma', 'url' => route('quality.norm.index')],
+                ['label' => 'Manual de Calidad'],
+            ]" />
 
             @if (session('status'))
                 <div class="mb-4 p-3 rounded bg-green-50 text-green-700">
@@ -80,7 +83,7 @@
                                 <p class="text-xs text-gray-500 mt-1">{{ $current->observation }}</p>
                             @endif
                         </div>
-                        <a href="{{ route('quality.manual-calidad.versions.download', $current) }}"
+                        <a href="{{ route('quality.documents.versions.download', $current) }}"
                            class="px-3 py-1.5 rounded-md bg-teal-600 text-white text-xs font-semibold hover:bg-teal-700 whitespace-nowrap">
                             Descargar
                         </a>
@@ -151,7 +154,7 @@
                                     <td class="py-2 px-3 text-gray-600 whitespace-nowrap">{{ $version->uploaded_at->format('d-m-Y H:i') }}</td>
                                     <td class="py-2 px-3 text-gray-600">{{ $version->observation ?? '—' }}</td>
                                     <td class="py-2 px-3 text-right">
-                                        <a href="{{ route('quality.manual-calidad.versions.download', $version) }}"
+                                        <a href="{{ route('quality.documents.versions.download', $version) }}"
                                            class="text-indigo-600 hover:underline text-xs font-medium">
                                             Descargar
                                         </a>

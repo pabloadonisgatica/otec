@@ -79,9 +79,14 @@ class QualityDocumentController extends Controller
 
     /**
      * Descargar una versión específica (vigente o del historial).
+     * Si la versión es un enlace externo, redirige a él.
      */
     public function downloadVersion(QualityDocumentVersion $version)
     {
+        if ($version->isExternalLink()) {
+            return redirect()->away($version->external_url);
+        }
+
         abort_unless(Storage::disk('public')->exists($version->file_path), 404);
 
         return Storage::disk('public')->download($version->file_path, $version->file_name);

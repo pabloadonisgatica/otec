@@ -25,6 +25,9 @@ use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\QualityNormController;
 use App\Http\Controllers\QualityProfileController;
 use App\Http\Controllers\QualityDocumentController;
+use App\Http\Controllers\ProcedureController;
+use App\Http\Controllers\ExternalDocumentController;
+use App\Http\Controllers\QualityRecordController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -378,8 +381,26 @@ Route::middleware('auth')->group(function () {
         Route::post('/manual-calidad/versiones', [QualityDocumentController::class, 'uploadVersion'])
             ->name('manual-calidad.versions.upload');
 
-        Route::get('/manual-calidad/versiones/{version}/descargar', [QualityDocumentController::class, 'downloadVersion'])
-            ->name('manual-calidad.versions.download');
+        Route::get('/documentos/versiones/{version}/descargar', [QualityDocumentController::class, 'downloadVersion'])
+            ->name('documents.versions.download');
+
+        Route::resource('procedimientos', ProcedureController::class)
+            ->parameters(['procedimientos' => 'procedure'])
+            ->names('procedures');
+
+        Route::post('/procedimientos/{procedure}/versiones', [ProcedureController::class, 'uploadVersion'])
+            ->name('procedures.versions.upload');
+
+        Route::resource('documentos-externos', ExternalDocumentController::class)
+            ->parameters(['documentos-externos' => 'externalDocument'])
+            ->names('external-documents');
+
+        Route::post('/documentos-externos/{externalDocument}/versiones', [ExternalDocumentController::class, 'uploadVersion'])
+            ->name('external-documents.versions.upload');
+
+        Route::resource('registros', QualityRecordController::class)
+            ->parameters(['registros' => 'record'])
+            ->names('records');
 
         Route::resource('no-conformidades', NonConformityController::class)
             ->parameters(['no-conformidades' => 'non_conformity'])
