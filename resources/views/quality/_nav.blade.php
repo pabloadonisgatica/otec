@@ -1,6 +1,7 @@
 @php
     $qualityTabs = [
         ['label' => 'Ver Norma', 'route' => 'quality.norm.index', 'active' => request()->routeIs('quality.norm.*')],
+        ['label' => 'Encuestas', 'route' => 'quality.surveys.index', 'active' => request()->routeIs('quality.surveys.*')],
         ['label' => 'No Conformidades', 'route' => 'quality.non-conformities.index', 'active' => request()->routeIs('quality.non-conformities.*')],
         ['label' => 'Proveedores', 'route' => 'quality.providers.index', 'active' => request()->routeIs('quality.providers.*')],
     ];

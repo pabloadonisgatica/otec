@@ -21,11 +21,11 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('settings.users.update', $user) }}" class="space-y-6">
+                    <form method="POST" action="{{ route('settings.users.update', $user) }}" enctype="multipart/form-data" class="space-y-6">
                         @csrf
                         @method('PUT')
 
-                        @include('settings.users._form', ['modules' => $modules, 'user' => $user])
+                        @include('settings.users._form', ['modules' => $modules, 'user' => $user, 'positions' => $positions])
 
                         <div class="flex items-center justify-end gap-3 pt-2">
                             <a href="{{ route('settings.users.index') }}" class="text-sm text-gray-600 hover:underline">

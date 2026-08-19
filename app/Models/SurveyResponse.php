@@ -8,7 +8,10 @@ class SurveyResponse extends Model
 {
     protected $fillable = [
         'execution_id',
+        'evaluator_type',
         'participant_id',
+        'instructor_id',
+        'evaluator_name',
         'token',
         'suggestions',
         'submitted_at',
@@ -30,6 +33,11 @@ class SurveyResponse extends Model
         return $this->belongsTo(Participant::class);
     }
 
+    public function instructor()
+    {
+        return $this->belongsTo(Instructor::class);
+    }
+
     public function answers()
     {
         return $this->hasMany(SurveyAnswer::class);
@@ -38,5 +46,10 @@ class SurveyResponse extends Model
     public function isSubmitted(): bool
     {
         return $this->submitted_at !== null;
+    }
+
+    public function isManagementEvaluation(): bool
+    {
+        return $this->evaluator_type === 'gerencia';
     }
 }

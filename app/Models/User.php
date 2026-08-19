@@ -22,6 +22,11 @@ class User extends Authenticatable
         'password',
         'role',
         'permissions',
+        'position',
+        'birth_date',
+        'gender',
+        'photo_path',
+        'documents',
     ];
 
     /**
@@ -43,6 +48,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'permissions' => 'array',
+            'birth_date' => 'date',
+            'documents' => 'array',
         ];
     }
 

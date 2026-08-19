@@ -24,5 +24,6 @@ class DatabaseSeeder extends Seeder
         $this->call(HolidaySeeder::class);
         $this->call(SurveyQuestionSeeder::class);
         $this->call(DiplomaTemplateSeeder::class);
+        $this->call(ExecutionChecklistItemSeeder::class);
     }
 }

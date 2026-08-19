@@ -127,10 +127,14 @@ class ExecutionController extends Controller
             'instructors',
             'evaluations',
             'surveyResponses',
+            'checklistResponses',
         ]);
 
         $participants = \App\Models\Participant::orderBy('first_name')->get();
         $instructors = \App\Models\Instructor::orderBy('name')->get();
+
+        $checklistItems = \App\Models\ExecutionChecklistItem::orderBy('sort_order')->get();
+        $checklistResponses = $execution->checklistResponses->keyBy('checklist_item_id');
 
         $planningValidation = $planningValidationService->validate($execution);
         $surveySummary = $surveyService->summary($execution);
@@ -147,7 +151,9 @@ class ExecutionController extends Controller
             'breadcrumbs',
             'tab',
             'planningValidation',
-            'surveySummary'
+            'surveySummary',
+            'checklistItems',
+            'checklistResponses'
         ));
     }
     /**

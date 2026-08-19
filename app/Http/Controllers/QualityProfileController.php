@@ -37,10 +37,7 @@ class QualityProfileController extends Controller
      */
     public function uploadProcessMap(Request $request)
     {
-        $this->uploadSingleImage(
-            $request,
-            column: 'process_map',
-        );
+        $this->uploadSingleImage($request, column: 'process_map');
 
         return redirect()
             ->route('quality.profile.edit', ['tab' => 'process-map'])
@@ -52,10 +49,7 @@ class QualityProfileController extends Controller
      */
     public function uploadOrgChart(Request $request)
     {
-        $this->uploadSingleImage(
-            $request,
-            column: 'org_chart',
-        );
+        $this->uploadSingleImage($request, column: 'org_chart');
 
         return redirect()
             ->route('quality.profile.edit', ['tab' => 'org-chart'])
@@ -90,26 +84,88 @@ class QualityProfileController extends Controller
         ]);
     }
 
-    /**
-     * Subir un documento legal.
-     */
+    // ---------------------------------------------------------------
+    // Documentación Legal
+    // ---------------------------------------------------------------
+
     public function uploadDocument(Request $request)
+    {
+        $this->uploadToDocumentList($request, 'legal_documents', 'quality/legal-documents');
+
+        return redirect()
+            ->route('quality.profile.edit', ['tab' => 'legal'])
+            ->with('status', 'Documento agregado correctamente.');
+    }
+
+    public function downloadDocument(int $index)
+    {
+        return $this->downloadFromDocumentList('legal_documents', $index);
+    }
+
+    public function deleteDocument(int $index)
+    {
+        $this->deleteFromDocumentList('legal_documents', $index);
+
+        return redirect()
+            ->route('quality.profile.edit', ['tab' => 'legal'])
+            ->with('status', 'Documento eliminado.');
+    }
+
+    // ---------------------------------------------------------------
+    // Requisitos Financieros (6.5)
+    // ---------------------------------------------------------------
+
+    public function financial()
+    {
+        $profile = QualityProfile::current();
+
+        return view('quality.financial-documents', compact('profile'));
+    }
+
+    public function uploadFinancialDocument(Request $request)
+    {
+        $this->uploadToDocumentList($request, 'financial_documents', 'quality/financial-documents');
+
+        return redirect()
+            ->route('quality.financial-documents')
+            ->with('status', 'Documento agregado correctamente.');
+    }
+
+    public function downloadFinancialDocument(int $index)
+    {
+        return $this->downloadFromDocumentList('financial_documents', $index);
+    }
+
+    public function deleteFinancialDocument(int $index)
+    {
+        $this->deleteFromDocumentList('financial_documents', $index);
+
+        return redirect()
+            ->route('quality.financial-documents')
+            ->with('status', 'Documento eliminado.');
+    }
+
+    // ---------------------------------------------------------------
+    // Lógica compartida: listas de documentos (array en QualityProfile)
+    // ---------------------------------------------------------------
+
+    private function uploadToDocumentList(Request $request, string $field, string $storagePath): void
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'file' => ['required', 'file', 'max:71680'], // 70MB, igual al sistema de referencia
+            'file' => ['required', 'file', 'max:71680'], // 70MB
         ]);
 
         $profile = QualityProfile::current();
-        $docs = $profile->legal_documents ?? [];
+        $docs = $profile->$field ?? [];
 
-        $file = $validated['file'] ?? $request->file('file');
+        $file = $request->file('file');
 
         $safeBase = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
         $ext = $file->getClientOriginalExtension();
         $filename = $safeBase . '_' . Str::random(8) . '.' . $ext;
 
-        $path = $file->storeAs('quality/legal-documents', $filename, 'public');
+        $path = $file->storeAs($storagePath, $filename, 'public');
 
         $docs[] = [
             'title' => $validated['title'],
@@ -121,21 +177,14 @@ class QualityProfileController extends Controller
             'uploaded_at' => now()->toDateTimeString(),
         ];
 
-        $profile->legal_documents = $docs;
+        $profile->$field = $docs;
         $profile->save();
-
-        return redirect()
-            ->route('quality.profile.edit', ['tab' => 'legal'])
-            ->with('status', 'Documento agregado correctamente.');
     }
 
-    /**
-     * Descargar / ver un documento legal.
-     */
-    public function downloadDocument(int $index)
+    private function downloadFromDocumentList(string $field, int $index)
     {
         $profile = QualityProfile::current();
-        $docs = $profile->legal_documents ?? [];
+        $docs = $profile->$field ?? [];
 
         abort_unless(isset($docs[$index]), 404);
 
@@ -146,13 +195,10 @@ class QualityProfileController extends Controller
         return Storage::disk('public')->download($doc['path'], $doc['name'] ?? 'documento');
     }
 
-    /**
-     * Eliminar un documento legal.
-     */
-    public function deleteDocument(int $index)
+    private function deleteFromDocumentList(string $field, int $index): void
     {
         $profile = QualityProfile::current();
-        $docs = $profile->legal_documents ?? [];
+        $docs = $profile->$field ?? [];
 
         abort_unless(isset($docs[$index]), 404);
 
@@ -163,11 +209,7 @@ class QualityProfileController extends Controller
         }
 
         array_splice($docs, $index, 1);
-        $profile->legal_documents = $docs;
+        $profile->$field = $docs;
         $profile->save();
-
-        return redirect()
-            ->route('quality.profile.edit', ['tab' => 'legal'])
-            ->with('status', 'Documento eliminado.');
     }
 }

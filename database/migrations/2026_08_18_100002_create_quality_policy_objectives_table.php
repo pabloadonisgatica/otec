@@ -1,0 +1,29 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('quality_policy_objectives', function (Blueprint $table) {
+
+            $table->id();
+
+            $table->foreignId('quality_policy_commitment_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->text('title');
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('quality_policy_objectives');
+    }
+};

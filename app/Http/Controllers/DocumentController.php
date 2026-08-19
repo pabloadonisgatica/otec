@@ -9,6 +9,7 @@ class DocumentController extends Controller
 {
     private array $map = [
         'instructors' => \App\Models\Instructor::class,
+        'users' => \App\Models\User::class,
         // 'companies' => \App\Models\Company::class,
         // 'courses' => \App\Models\Course::class,
     ];

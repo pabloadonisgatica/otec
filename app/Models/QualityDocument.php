@@ -30,6 +30,11 @@ class QualityDocument extends Model
             ->orderByDesc('version_number');
     }
 
+    public function indicators()
+    {
+        return $this->hasMany(QualityStrategicIndicator::class);
+    }
+
     public function currentVersion()
     {
         return $this->versions()->first();
@@ -44,6 +49,17 @@ class QualityDocument extends Model
         return self::firstOrCreate(
             ['type' => 'manual_calidad'],
             ['name' => 'Manual de Calidad']
+        );
+    }
+
+    /**
+     * Planificación Estratégica — también singleton.
+     */
+    public static function strategicPlan(): self
+    {
+        return self::firstOrCreate(
+            ['type' => 'planificacion_estrategica'],
+            ['name' => 'Planificación Estratégica']
         );
     }
 }

@@ -72,25 +72,13 @@
                     $current = $document->versions->first();
                 @endphp
 
-                @if($current)
-                    <div class="flex items-center justify-between border border-gray-200 rounded-lg p-4 mb-6">
-                        <div>
-                            <p class="font-medium text-gray-900">Versión {{ $current->version_number }} — {{ $current->file_name }}</p>
-                            <p class="text-xs text-gray-500">
-                                Subido por {{ $current->uploaded_by }} el {{ $current->uploaded_at->format('d-m-Y H:i') }}
-                            </p>
-                            @if($current->observation)
-                                <p class="text-xs text-gray-500 mt-1">{{ $current->observation }}</p>
-                            @endif
-                        </div>
-                        <a href="{{ route('quality.documents.versions.download', $current) }}"
-                           class="px-3 py-1.5 rounded-md bg-teal-600 text-white text-xs font-semibold hover:bg-teal-700 whitespace-nowrap">
-                            Descargar
-                        </a>
-                    </div>
-                @else
-                    <p class="text-sm text-gray-500 mb-6">Aún no se ha subido ninguna versión.</p>
+                <x-document-preview :version="$current" />
+
+                @if($current && $current->observation)
+                    <p class="text-xs text-gray-500 mt-2">{{ $current->observation }}</p>
                 @endif
+
+                <div class="mb-6"></div>
 
                 <h4 class="text-sm font-semibold text-gray-700 mb-3">Subir nueva versión</h4>
 

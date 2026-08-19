@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class UserManagementController extends Controller
@@ -16,6 +18,16 @@ class UserManagementController extends Controller
         'instructors' => 'Relatores',
         'participants' => 'Participantes',
         'settings' => 'Configuración',
+    ];
+
+    // Sugerencias de cargo — texto libre, no una lista cerrada.
+    public const POSITIONS = [
+        'Gerente General',
+        'Jefe Administrativo',
+        'Auditor Interno',
+        'Relator',
+        'Representante de la Gerencia',
+        'Socio',
     ];
 
     public function index()
@@ -46,6 +58,7 @@ class UserManagementController extends Controller
         return view('settings.users.create', [
             'breadcrumbs' => $breadcrumbs,
             'modules' => $this->modules,
+            'positions' => self::POSITIONS,
         ]);
     }
 
@@ -58,6 +71,10 @@ class UserManagementController extends Controller
             'role' => ['required', Rule::in(['admin', 'user'])],
             'permissions' => ['nullable', 'array'],
             'permissions.*' => ['string'],
+            'position' => ['nullable', 'string', 'max:255'],
+            'birth_date' => ['nullable', 'date'],
+            'gender' => ['nullable', 'in:Mujer,Hombre,Otro,Prefiero no indicarlo'],
+            'photo' => ['nullable', 'image', 'max:2048'],
         ]);
 
         // si es admin, no necesitamos guardar permisos
@@ -67,7 +84,14 @@ class UserManagementController extends Controller
             $data['permissions'] = array_values(array_intersect(array_keys($this->modules), $data['permissions'] ?? []));
         }
 
+        if ($request->hasFile('photo')) {
+            $data['photo_path'] = $request->file('photo')->store('users/photos', 'public');
+        }
+        unset($data['photo']);
+
         $user = User::create($data);
+
+        $this->appendUploadedDocuments($request, $user);
 
         return redirect()
             ->route('settings.users.edit', $user)
@@ -86,6 +110,7 @@ class UserManagementController extends Controller
             'user' => $user,
             'breadcrumbs' => $breadcrumbs,
             'modules' => $this->modules,
+            'positions' => self::POSITIONS,
         ]);
     }
 
@@ -98,6 +123,10 @@ class UserManagementController extends Controller
             'role' => ['required', Rule::in(['admin', 'user'])],
             'permissions' => ['nullable', 'array'],
             'permissions.*' => ['string'],
+            'position' => ['nullable', 'string', 'max:255'],
+            'birth_date' => ['nullable', 'date'],
+            'gender' => ['nullable', 'in:Mujer,Hombre,Otro,Prefiero no indicarlo'],
+            'photo' => ['nullable', 'image', 'max:2048'],
         ]);
 
         // password solo si viene
@@ -111,8 +140,61 @@ class UserManagementController extends Controller
             $data['permissions'] = array_values(array_intersect(array_keys($this->modules), $data['permissions'] ?? []));
         }
 
+        if ($request->hasFile('photo')) {
+            if ($user->photo_path && Storage::disk('public')->exists($user->photo_path)) {
+                Storage::disk('public')->delete($user->photo_path);
+            }
+            $data['photo_path'] = $request->file('photo')->store('users/photos', 'public');
+        }
+        unset($data['photo']);
+
         $user->update($data);
 
+        $this->appendUploadedDocuments($request, $user);
+
         return back()->with('status', 'Usuario actualizado correctamente.');
+    }
+
+    /**
+     * Mismo patrón exacto que InstructorController: agrega los
+     * documentos subidos al array existente, sin borrar los previos.
+     */
+    private function appendUploadedDocuments(Request $request, User $user): void
+    {
+        $existing = $user->documents ?? [];
+        $existing = array_values(array_filter($existing, function ($d) {
+            return is_array($d) && !empty($d['path'] ?? null);
+        }));
+
+        if (!$request->hasFile('documents')) {
+            $user->documents = $existing;
+            $user->save();
+            return;
+        }
+
+        $label = trim((string) $request->input('document_label', 'Documento'));
+        if ($label === '') $label = 'Documento';
+
+        foreach ($request->file('documents') as $file) {
+            if (!$file) continue;
+
+            $safeBase = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+            $ext = $file->getClientOriginalExtension();
+            $filename = $safeBase . '_' . Str::random(8) . '.' . $ext;
+
+            $path = $file->storeAs('users/' . $user->id, $filename, 'public');
+
+            $existing[] = [
+                'label' => $label,
+                'path' => $path,
+                'name' => $file->getClientOriginalName(),
+                'mime' => $file->getClientMimeType(),
+                'size' => $file->getSize(),
+                'uploaded_at' => now()->toDateTimeString(),
+            ];
+        }
+
+        $user->documents = $existing;
+        $user->save();
     }
 }

@@ -91,4 +91,16 @@ class QualityDocumentController extends Controller
 
         return Storage::disk('public')->download($version->file_path, $version->file_name);
     }
+
+    /**
+     * Servir el archivo inline (sin forzar descarga) — usado
+     * para la vista previa embebida (PDF/imágenes).
+     */
+    public function viewVersion(QualityDocumentVersion $version)
+    {
+        abort_if($version->isExternalLink(), 404);
+        abort_unless(Storage::disk('public')->exists($version->file_path), 404);
+
+        return Storage::disk('public')->response($version->file_path, $version->file_name);
+    }
 }

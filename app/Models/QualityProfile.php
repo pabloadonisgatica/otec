@@ -17,11 +17,13 @@ class QualityProfile extends Model
         'process_map_path',
         'org_chart_title',
         'org_chart_path',
+        'financial_documents',
     ];
 
     protected $casts = [
         'last_audit_date' => 'date',
         'legal_documents' => 'array',
+        'financial_documents' => 'array',
     ];
 
     /**

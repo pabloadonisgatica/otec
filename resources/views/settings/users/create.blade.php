@@ -15,10 +15,10 @@
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="p-6">
 
-                    <form method="POST" action="{{ route('settings.users.store') }}" class="space-y-6">
+                    <form method="POST" action="{{ route('settings.users.store') }}" enctype="multipart/form-data" class="space-y-6">
                         @csrf
 
-                        @include('settings.users._form', ['modules' => $modules])
+                        @include('settings.users._form', ['modules' => $modules, 'positions' => $positions])
 
                         <div class="flex items-center justify-end gap-3 pt-2">
                             <a href="{{ route('settings.users.index') }}" class="text-sm text-gray-600 hover:underline">

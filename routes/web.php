@@ -14,6 +14,7 @@ use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\DiplomaTemplateController;
 use App\Http\Controllers\DiplomaController;
 use App\Http\Controllers\ExecutionController;
+use App\Http\Controllers\ExecutionChecklistController;
 use App\Http\Controllers\ExecutionSessionController;
 use App\Http\Controllers\ClassBookController;
 use App\Http\Controllers\ExecutionSurveyController;
@@ -28,9 +29,18 @@ use App\Http\Controllers\QualityDocumentController;
 use App\Http\Controllers\ProcedureController;
 use App\Http\Controllers\ExternalDocumentController;
 use App\Http\Controllers\QualityRecordController;
+use App\Http\Controllers\ClientRequirementController;
+use App\Http\Controllers\QualityPolicyController;
+use App\Http\Controllers\StrategicPlanController;
+use App\Http\Controllers\QualityRepresentativeController;
+use App\Http\Controllers\QualityInternalCommunicationController;
+use App\Http\Controllers\QualityJobProfileController;
+use App\Http\Controllers\QualitySurveyController;
+use App\Http\Controllers\QualityInternalTrainingController;
+use App\Http\Controllers\QualityChecklistController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('dashboard');
 });
 
 Route::get('/dashboard', function () {
@@ -209,6 +219,9 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('executions', ExecutionController::class);
 
+    Route::put('/executions/{execution}/checklist', [ExecutionChecklistController::class, 'update'])
+        ->name('executions.checklist.update');
+
     Route::put(
         '/executions/{execution}/close',
         [ExecutionController::class, 'close']
@@ -366,6 +379,18 @@ Route::middleware('auth')->group(function () {
         Route::delete('/requisitos-generales/documentos/{index}', [QualityProfileController::class, 'deleteDocument'])
             ->name('profile.documents.delete');
 
+        Route::get('/requisitos-financieros', [QualityProfileController::class, 'financial'])
+            ->name('financial-documents');
+
+        Route::post('/requisitos-financieros/documentos', [QualityProfileController::class, 'uploadFinancialDocument'])
+            ->name('financial-documents.upload');
+
+        Route::get('/requisitos-financieros/documentos/{index}/descargar', [QualityProfileController::class, 'downloadFinancialDocument'])
+            ->name('financial-documents.download');
+
+        Route::delete('/requisitos-financieros/documentos/{index}', [QualityProfileController::class, 'deleteFinancialDocument'])
+            ->name('financial-documents.delete');
+
         Route::post('/requisitos-generales/mapa-procesos', [QualityProfileController::class, 'uploadProcessMap'])
             ->name('profile.process-map.upload');
 
@@ -384,6 +409,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/documentos/versiones/{version}/descargar', [QualityDocumentController::class, 'downloadVersion'])
             ->name('documents.versions.download');
 
+        Route::get('/documentos/versiones/{version}/ver', [QualityDocumentController::class, 'viewVersion'])
+            ->name('documents.versions.view');
+
         Route::resource('procedimientos', ProcedureController::class)
             ->parameters(['procedimientos' => 'procedure'])
             ->names('procedures');
@@ -401,6 +429,93 @@ Route::middleware('auth')->group(function () {
         Route::resource('registros', QualityRecordController::class)
             ->parameters(['registros' => 'record'])
             ->names('records');
+
+        Route::resource('requerimientos', ClientRequirementController::class)
+            ->parameters(['requerimientos' => 'requirement'])
+            ->names('requirements');
+
+        Route::post('/requerimientos/{requirement}/versiones', [ClientRequirementController::class, 'uploadVersion'])
+            ->name('requirements.versions.upload');
+
+        Route::get('/politica-calidad', [QualityPolicyController::class, 'edit'])
+            ->name('policy.edit');
+
+        Route::put('/politica-calidad', [QualityPolicyController::class, 'update'])
+            ->name('policy.update');
+
+        Route::post('/politica-calidad/compromisos', [QualityPolicyController::class, 'storeCommitment'])
+            ->name('policy.commitments.store');
+
+        Route::put('/politica-calidad/compromisos/{commitment}', [QualityPolicyController::class, 'updateCommitment'])
+            ->name('policy.commitments.update');
+
+        Route::delete('/politica-calidad/compromisos/{commitment}', [QualityPolicyController::class, 'destroyCommitment'])
+            ->name('policy.commitments.destroy');
+
+        Route::post('/politica-calidad/compromisos/{commitment}/objetivos', [QualityPolicyController::class, 'storeObjective'])
+            ->name('policy.objectives.store');
+
+        Route::put('/politica-calidad/objetivos/{objective}', [QualityPolicyController::class, 'updateObjective'])
+            ->name('policy.objectives.update');
+
+        Route::delete('/politica-calidad/objetivos/{objective}', [QualityPolicyController::class, 'destroyObjective'])
+            ->name('policy.objectives.destroy');
+
+        Route::get('/planificacion-estrategica', [StrategicPlanController::class, 'edit'])
+            ->name('strategic-plan');
+
+        Route::post('/planificacion-estrategica/versiones', [StrategicPlanController::class, 'uploadVersion'])
+            ->name('strategic-plan.versions.upload');
+
+        Route::post('/planificacion-estrategica/indicadores', [StrategicPlanController::class, 'storeIndicator'])
+            ->name('strategic-plan.indicators.store');
+
+        Route::put('/planificacion-estrategica/indicadores/{indicator}', [StrategicPlanController::class, 'updateIndicator'])
+            ->name('strategic-plan.indicators.update');
+
+        Route::delete('/planificacion-estrategica/indicadores/{indicator}', [StrategicPlanController::class, 'destroyIndicator'])
+            ->name('strategic-plan.indicators.destroy');
+
+        Route::get('/representante-direccion', [QualityRepresentativeController::class, 'index'])
+            ->name('representatives.index');
+
+        Route::post('/representante-direccion', [QualityRepresentativeController::class, 'store'])
+            ->name('representatives.store');
+
+        Route::delete('/representante-direccion/{representative}', [QualityRepresentativeController::class, 'destroy'])
+            ->name('representatives.destroy');
+
+        Route::resource('comunicacion-interna', QualityInternalCommunicationController::class)
+            ->except(['show'])
+            ->parameters(['comunicacion-interna' => 'communication'])
+            ->names('internal-communications');
+
+        Route::resource('perfiles-cargo', QualityJobProfileController::class)
+            ->parameters(['perfiles-cargo' => 'jobProfile'])
+            ->names('job-profiles');
+
+        Route::get('/encuestas', [QualitySurveyController::class, 'index'])
+            ->name('surveys.index');
+
+        Route::get('/encuestas/evaluar/{execution}/{instructor}', [QualitySurveyController::class, 'createManagementEvaluation'])
+            ->name('surveys.evaluate.create');
+
+        Route::post('/encuestas/evaluar/{execution}/{instructor}', [QualitySurveyController::class, 'storeManagementEvaluation'])
+            ->name('surveys.evaluate.store');
+
+        Route::get('/encuestas/gerencia/{response}', [QualitySurveyController::class, 'showManagementEvaluation'])
+            ->name('surveys.management.show');
+
+        Route::get('/capacitacion-interna/{internalTraining}/pdf', [QualityInternalTrainingController::class, 'pdf'])
+            ->name('internal-trainings.pdf');
+
+        Route::resource('capacitacion-interna', QualityInternalTrainingController::class)
+            ->except(['show'])
+            ->parameters(['capacitacion-interna' => 'internalTraining'])
+            ->names('internal-trainings');
+
+        Route::get('/checklist-sala-clases', [QualityChecklistController::class, 'index'])
+            ->name('checklist.index');
 
         Route::resource('no-conformidades', NonConformityController::class)
             ->parameters(['no-conformidades' => 'non_conformity'])
