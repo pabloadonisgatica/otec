@@ -30,10 +30,15 @@ class QualitySurveyController extends Controller
         foreach ($executions as $execution) {
             foreach ($execution->instructors as $instructor) {
 
-                $participantStats = SurveyResponse::where('execution_id', $execution->id)
-                    ->where('evaluator_type', 'participante')
-                    ->whereNotNull('submitted_at')
-                    ->count();
+                // El flujo de invitación por correo (participante) quedó
+                // reemplazado por el sistema de encuesta pública por link/QR.
+                // Contamos las respuestas anónimas de ExecutionSurvey para
+                // que este tablero de auditoría NCH 2728 siga reflejando
+                // la realidad con el nuevo sistema.
+                $participantStats = \App\Models\ExecutionSurveyResponse::whereHas(
+                    'executionSurvey',
+                    fn ($q) => $q->where('execution_id', $execution->id)
+                )->count();
 
                 $managementEvaluation = SurveyResponse::where('execution_id', $execution->id)
                     ->where('evaluator_type', 'gerencia')

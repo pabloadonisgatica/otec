@@ -102,6 +102,11 @@ class Execution extends Model
         return $this->hasMany(SurveyResponse::class);
     }
 
+    public function executionSurvey()
+    {
+        return $this->hasOne(ExecutionSurvey::class);
+    }
+
     public function checklistResponses()
     {
         return $this->hasMany(ExecutionChecklistResponse::class);

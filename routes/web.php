@@ -38,6 +38,10 @@ use App\Http\Controllers\QualityJobProfileController;
 use App\Http\Controllers\QualitySurveyController;
 use App\Http\Controllers\QualityInternalTrainingController;
 use App\Http\Controllers\QualityChecklistController;
+use App\Http\Controllers\SurveyTemplateController;
+use App\Http\Controllers\ExecutionSurveyTemplateController;
+use App\Http\Controllers\PublicExecutionSurveyController;
+use App\Http\Controllers\ExecutionSurveyExportController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -58,6 +62,12 @@ Route::get('/encuesta/{token}', [SurveyController::class, 'show'])
 
 Route::post('/encuesta/{token}', [SurveyController::class, 'store'])
     ->name('survey.store');
+
+Route::get('/encuesta-ejecucion/{token}', [PublicExecutionSurveyController::class, 'show'])
+    ->name('execution-survey.public.show');
+
+Route::post('/encuesta-ejecucion/{token}', [PublicExecutionSurveyController::class, 'store'])
+    ->name('execution-survey.public.store');
 
 Route::get('/validar/{code}', [DiplomaController::class, 'validateCode'])
     ->name('diplomas.validate');
@@ -131,6 +141,16 @@ Route::middleware('auth')->group(function () {
     */
 
     Route::resource('courses', CourseController::class);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Templates Encuestas
+    |--------------------------------------------------------------------------
+    */
+
+    Route::resource('plantillas-encuestas', SurveyTemplateController::class)
+        ->parameters(['plantillas-encuestas' => 'survey_template'])
+        ->names('survey-templates');
 
     /*
     |--------------------------------------------------------------------------
@@ -352,6 +372,21 @@ Route::middleware('auth')->group(function () {
         '/executions/{execution}/survey/send',
         [ExecutionSurveyController::class, 'send']
     )->name('executions.survey.send');
+
+    Route::post(
+        '/executions/{execution}/survey-template',
+        [ExecutionSurveyTemplateController::class, 'store']
+    )->name('executions.survey-template.store');
+
+    Route::delete(
+        '/executions/{execution}/survey-template',
+        [ExecutionSurveyTemplateController::class, 'destroy']
+    )->name('executions.survey-template.destroy');
+
+    Route::get(
+        '/executions/{execution}/survey/export',
+        [ExecutionSurveyExportController::class, 'export']
+    )->name('executions.survey.export');
 
     /*
 |--------------------------------------------------------------------------

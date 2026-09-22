@@ -115,7 +115,8 @@ class ExecutionController extends Controller
     public function show(
         \App\Models\Execution $execution,
         \App\Services\PlanningValidationService $planningValidationService,
-        \App\Services\SurveyService $surveyService
+        \App\Services\SurveyService $surveyService,
+        \App\Services\ExecutionSurveyResultsService $executionSurveyResultsService
     )
     {
         $execution->load([
@@ -127,6 +128,7 @@ class ExecutionController extends Controller
             'instructors',
             'evaluations',
             'surveyResponses',
+            'executionSurvey.template',
             'checklistResponses',
         ]);
 
@@ -138,6 +140,13 @@ class ExecutionController extends Controller
 
         $planningValidation = $planningValidationService->validate($execution);
         $surveySummary = $surveyService->summary($execution);
+        $activeSurveyTemplates = \App\Models\SurveyTemplate::where('active', true)
+            ->orderBy('name')
+            ->get();
+
+        $executionSurveyResults = $execution->executionSurvey
+            ? $executionSurveyResultsService->summary($execution->executionSurvey)
+            : null;
 
         $breadcrumbs = [
             ['label' => 'Ejecuciones', 'url' => route('executions.index')],
@@ -152,6 +161,8 @@ class ExecutionController extends Controller
             'tab',
             'planningValidation',
             'surveySummary',
+            'activeSurveyTemplates',
+            'executionSurveyResults',
             'checklistItems',
             'checklistResponses'
         ));

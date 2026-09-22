@@ -64,6 +64,7 @@
                             <x-dropdown-link :href="route('courses.index')">{{ __('Cursos') }}</x-dropdown-link>
                             <x-dropdown-link :href="route('executions.index')">{{ __('Ejecuciones') }}</x-dropdown-link>
                             <x-dropdown-link :href="route('diplomas.index')">{{ __('Diplomas') }}</x-dropdown-link>
+                            <x-dropdown-link :href="route('survey-templates.index')">{{ __('Templates Encuestas') }}</x-dropdown-link>
                         </x-slot>
                     </x-dropdown>
 
@@ -172,6 +173,9 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('diplomas.index')" :active="request()->routeIs('diplomas.*') || request()->routeIs('diploma-templates.*')" class="flex items-center gap-2">
                     <x-icon name="certificate" class="w-4 h-4" /> {{ __('Diplomas') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('survey-templates.index')" :active="request()->routeIs('survey-templates.*')" class="flex items-center gap-2">
+                    <x-icon name="clipboard-list" class="w-4 h-4" /> {{ __('Templates Encuestas') }}
                 </x-responsive-nav-link>
             </div>
         </div>
