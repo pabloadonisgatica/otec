@@ -33,7 +33,9 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // Desactivado: su ruta /storage/{path} (URLs firmadas del disco privado)
+            // no se usa en el proyecto y bloqueaba la ruta que sirve el disco "public".
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],

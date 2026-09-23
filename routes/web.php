@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicStorageController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\DocumentController;
@@ -75,6 +76,13 @@ Route::get('/encuesta-ejecucion/{token}/gracias', [PublicExecutionSurveyControll
 
 Route::get('/validar/{code}', [DiplomaController::class, 'validateCode'])
     ->name('diplomas.validate');
+
+// Sirve archivos del disco "public" cuando el enlace public/storage no existe
+// (hosting sin SSH / deploy por zip). Si el enlace existe, Apache entrega el
+// archivo directo y esta ruta nunca se ejecuta.
+Route::get('/storage/{path}', PublicStorageController::class)
+    ->where('path', '[A-Za-z0-9_\-\/]+\.[A-Za-z0-9]+')
+    ->name('public-storage.show');
 
 Route::middleware('auth')->group(function () {
 

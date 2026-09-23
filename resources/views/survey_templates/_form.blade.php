@@ -33,7 +33,6 @@
       action="{{ $template->exists ? route('survey-templates.update', $template) : route('survey-templates.store') }}"
       x-data="{
           sections: {{ json_encode($initialSections) }},
-          fieldTypes: {{ json_encode(\App\Models\SurveyTemplateField::TYPES) }},
           addSection() {
               this.sections.push({ id: null, title: '', description: '', fields: [
                   { id: null, label: '', type: 'input', options_text: '', required: false }
@@ -149,9 +148,12 @@
                                 <label class="block text-xs font-medium text-gray-500 mb-1">Tipo de campo</label>
                                 <select :name="`sections[${sIndex}][fields][${fIndex}][type]`" x-model="field.type"
                                         class="w-full border-gray-300 rounded-md shadow-sm text-sm">
-                                    <template x-for="(label, value) in fieldTypes" :key="value">
-                                        <option :value="value" x-text="label"></option>
-                                    </template>
+                                    {{-- Opciones renderizadas por Blade (no con x-for): así ya existen
+                                         cuando x-model asigna el valor. Con x-for, el select quedaba
+                                         en la primera opción ("Texto corto") y eso era lo que se enviaba. --}}
+                                    @foreach (\App\Models\SurveyTemplateField::TYPES as $typeValue => $typeLabel)
+                                        <option value="{{ $typeValue }}">{{ $typeLabel }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="flex items-end justify-between">
