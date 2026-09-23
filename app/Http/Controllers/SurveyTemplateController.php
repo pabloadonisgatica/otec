@@ -6,6 +6,7 @@ use App\Models\SurveyTemplate;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class SurveyTemplateController extends Controller
 {
@@ -39,10 +40,17 @@ class SurveyTemplateController extends Controller
     {
         $data = $this->validateTemplate($request);
 
-        DB::transaction(function () use ($data) {
+        DB::transaction(function () use ($data, $request) {
+            $bannerPath = null;
+            if ($request->hasFile('banner')) {
+                $bannerPath = $request->file('banner')->store('survey-banners', 'public');
+            }
+
             $template = SurveyTemplate::create([
-                'name' => $data['name'],
-                'active' => $data['active'] ?? false,
+                'name'        => $data['name'],
+                'active'      => $data['active'] ?? false,
+                'banner_path' => $bannerPath,
+                'description' => $data['description'] ?? null,
             ]);
 
             $this->syncSections($template, $data['sections'] ?? []);
@@ -73,10 +81,26 @@ class SurveyTemplateController extends Controller
         $data = $this->validateTemplate($request);
         $warnings = [];
 
-        DB::transaction(function () use ($data, $survey_template, &$warnings) {
+        DB::transaction(function () use ($data, $survey_template, $request, &$warnings) {
+            $bannerPath = $survey_template->banner_path;
+
+            if ($request->hasFile('banner')) {
+                if ($bannerPath) {
+                    Storage::disk('public')->delete($bannerPath);
+                }
+                $bannerPath = $request->file('banner')->store('survey-banners', 'public');
+            }
+
+            if ($request->boolean('remove_banner') && $bannerPath) {
+                Storage::disk('public')->delete($bannerPath);
+                $bannerPath = null;
+            }
+
             $survey_template->update([
-                'name' => $data['name'],
-                'active' => $data['active'] ?? false,
+                'name'        => $data['name'],
+                'active'      => $data['active'] ?? false,
+                'banner_path' => $bannerPath,
+                'description' => $data['description'] ?? null,
             ]);
 
             // Actualiza en el lugar lo que ya existe (por id), crea lo nuevo,
@@ -101,11 +125,14 @@ class SurveyTemplateController extends Controller
     public function destroy(SurveyTemplate $survey_template)
     {
         try {
+            if ($survey_template->banner_path) {
+                Storage::disk('public')->delete($survey_template->banner_path);
+            }
             $survey_template->delete();
         } catch (QueryException $e) {
             if ($this->isForeignKeyViolation($e)) {
                 return back()->with(
-                    'status',
+                    'error',
                     'No se pudo eliminar: esta plantilla ya tiene encuestas o respuestas asociadas.'
                 );
             }
@@ -121,14 +148,16 @@ class SurveyTemplateController extends Controller
     private function validateTemplate(Request $request): array
     {
         return $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'active' => ['nullable', 'boolean'],
+            'name'          => ['required', 'string', 'max:255'],
+            'active'        => ['nullable', 'boolean'],
+            'description'   => ['nullable', 'string', 'max:5000'],
+            'banner'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'remove_banner' => ['nullable', 'boolean'],
 
             'sections' => ['required', 'array', 'min:1'],
             'sections.*.id' => ['nullable', 'integer'],
             'sections.*.title' => ['required', 'string', 'max:255'],
             'sections.*.description' => ['nullable', 'string', 'max:2000'],
-            'sections.*.repeats_per_instructor' => ['nullable', 'boolean'],
 
             'sections.*.fields' => ['required', 'array', 'min:1'],
             'sections.*.fields.*.id' => ['nullable', 'integer'],
@@ -158,7 +187,6 @@ class SurveyTemplateController extends Controller
             $attrs = [
                 'title' => $sectionData['title'],
                 'description' => $sectionData['description'] ?? null,
-                'repeats_per_instructor' => (bool) ($sectionData['repeats_per_instructor'] ?? false),
                 'sort_order' => $sectionIndex,
             ];
 

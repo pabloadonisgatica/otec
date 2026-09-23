@@ -42,6 +42,7 @@ use App\Http\Controllers\SurveyTemplateController;
 use App\Http\Controllers\ExecutionSurveyTemplateController;
 use App\Http\Controllers\PublicExecutionSurveyController;
 use App\Http\Controllers\ExecutionSurveyExportController;
+use App\Http\Controllers\ExecutionSurveyAdminController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -68,6 +69,9 @@ Route::get('/encuesta-ejecucion/{token}', [PublicExecutionSurveyController::clas
 
 Route::post('/encuesta-ejecucion/{token}', [PublicExecutionSurveyController::class, 'store'])
     ->name('execution-survey.public.store');
+
+Route::get('/encuesta-ejecucion/{token}/gracias', [PublicExecutionSurveyController::class, 'thanks'])
+    ->name('execution-survey.public.thanks');
 
 Route::get('/validar/{code}', [DiplomaController::class, 'validateCode'])
     ->name('diplomas.validate');
@@ -387,6 +391,16 @@ Route::middleware('auth')->group(function () {
         '/executions/{execution}/survey/export',
         [ExecutionSurveyExportController::class, 'export']
     )->name('executions.survey.export');
+
+    Route::get(
+        '/executions/{execution}/survey/qr-download',
+        [ExecutionSurveyAdminController::class, 'downloadQr']
+    )->name('executions.survey.qr-download');
+
+    Route::delete(
+        '/executions/{execution}/survey/responses',
+        [ExecutionSurveyAdminController::class, 'clearResponses']
+    )->name('executions.survey.clear-responses');
 
     /*
 |--------------------------------------------------------------------------

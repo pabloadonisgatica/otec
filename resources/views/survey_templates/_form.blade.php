@@ -5,7 +5,6 @@
                 'id' => $section->id,
                 'title' => $section->title,
                 'description' => $section->description,
-                'repeats_per_instructor' => (bool) $section->repeats_per_instructor,
                 'fields' => $section->fields->map(function ($field) {
                     return [
                         'id' => $field->id,
@@ -22,7 +21,6 @@
                 'id' => null,
                 'title' => '',
                 'description' => '',
-                'repeats_per_instructor' => false,
                 'fields' => [
                     ['id' => null, 'label' => '', 'type' => 'input', 'options_text' => '', 'required' => false],
                 ],
@@ -31,12 +29,13 @@
 @endphp
 
 <form method="POST"
+      enctype="multipart/form-data"
       action="{{ $template->exists ? route('survey-templates.update', $template) : route('survey-templates.store') }}"
       x-data="{
           sections: {{ json_encode($initialSections) }},
           fieldTypes: {{ json_encode(\App\Models\SurveyTemplateField::TYPES) }},
           addSection() {
-              this.sections.push({ id: null, title: '', description: '', repeats_per_instructor: false, fields: [
+              this.sections.push({ id: null, title: '', description: '', fields: [
                   { id: null, label: '', type: 'input', options_text: '', required: false }
               ] });
           },
@@ -70,6 +69,44 @@
                    class="rounded border-gray-300 text-indigo-600">
             <span class="ml-2 text-sm text-gray-700">Plantilla activa (disponible para seleccionar en Ejecuciones)</span>
         </label>
+
+        <div class="mt-6 border-t pt-5">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Banner de la encuesta
+                <span class="text-gray-400 font-normal">(opcional — JPG, PNG o WebP, 1600 × 400 px recomendado, máx. 4 MB)</span>
+            </label>
+
+            @if ($template->exists && $template->banner_path)
+                <div class="mb-3">
+                    <img src="{{ $template->bannerUrl() }}" alt="Banner actual"
+                         class="w-full max-h-32 object-cover rounded-lg border border-gray-200">
+                    <label class="inline-flex items-center mt-2">
+                        <input type="checkbox" name="remove_banner" value="1"
+                               class="rounded border-gray-300 text-red-600">
+                        <span class="ml-2 text-xs text-red-600">Quitar banner actual</span>
+                    </label>
+                </div>
+            @endif
+
+            <input type="file" name="banner" accept="image/jpeg,image/png,image/webp"
+                   class="w-full text-sm text-gray-700 border border-gray-300 rounded-lg p-2">
+            @error('banner')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div class="mt-6 border-t pt-5">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Descripción de la encuesta
+                <span class="text-gray-400 font-normal">(opcional — se muestra bajo el banner, antes de las preguntas)</span>
+            </label>
+            <textarea name="description" rows="4"
+                      placeholder="Ej: Solicitamos su colaboración para evaluar la actividad realizada..."
+                      class="w-full border-gray-300 rounded-md shadow-sm text-sm">{{ old('description', $template->description ?? '') }}</textarea>
+            @error('description')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
     </div>
 
     <template x-for="(section, sIndex) in sections" :key="sIndex">
@@ -96,16 +133,6 @@
                           placeholder="Ej: Marque la opción que a su criterio refleja su evaluación..."
                           class="w-full border-gray-300 rounded-md shadow-sm text-sm"></textarea>
             </div>
-
-            <label class="inline-flex items-center mb-4">
-                <input type="hidden" :name="`sections[${sIndex}][repeats_per_instructor]`" value="0">
-                <input type="checkbox" :name="`sections[${sIndex}][repeats_per_instructor]`" value="1"
-                       x-model="section.repeats_per_instructor"
-                       class="rounded border-gray-300 text-indigo-600">
-                <span class="ml-2 text-sm text-gray-700">
-                    Repetir esta sección una vez por cada relator de la ejecución
-                </span>
-            </label>
 
             <div class="space-y-3">
                 <template x-for="(field, fIndex) in section.fields" :key="fIndex">

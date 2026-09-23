@@ -10,12 +10,7 @@ class SurveyTemplateSection extends Model
         'survey_template_id',
         'title',
         'description',
-        'repeats_per_instructor',
         'sort_order',
-    ];
-
-    protected $casts = [
-        'repeats_per_instructor' => 'boolean',
     ];
 
     public function template()
