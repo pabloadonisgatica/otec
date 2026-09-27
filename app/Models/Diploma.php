@@ -23,6 +23,23 @@ class Diploma extends Model
         'snapshot'  => 'array',
     ];
 
+    /**
+     * RUT parcialmente oculto para la verificación pública
+     * (ej: 12.345.678-9 → **.***.678-9).
+     */
+    public function maskedRut(): ?string
+    {
+        $rut = $this->snapshot['participant']['rut'] ?? null;
+
+        if (! $rut) {
+            return null;
+        }
+
+        $visible = 5; // "678-9"
+
+        return preg_replace('/[0-9kK]/', '*', substr($rut, 0, -$visible)) . substr($rut, -$visible);
+    }
+
     public function template(): BelongsTo
     {
         return $this->belongsTo(DiplomaTemplate::class, 'template_id');

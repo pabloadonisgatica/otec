@@ -18,4 +18,12 @@ class AppSetting extends Model
     {
         return static::where('key', $key)->value('value') ?? $default;
     }
+
+    /**
+     * Guardar (o reemplazar) un setting por key.
+     */
+    public static function put(string $key, $value): void
+    {
+        static::updateOrCreate(['key' => $key], ['value' => $value]);
+    }
 }

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ExecutionReportController;
 use App\Http\Controllers\PublicStorageController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\InstructorController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\DiplomaTemplateController;
 use App\Http\Controllers\DiplomaController;
+use App\Http\Controllers\DiplomaLogoController;
 use App\Http\Controllers\ExecutionController;
 use App\Http\Controllers\ExecutionChecklistController;
 use App\Http\Controllers\ExecutionSessionController;
@@ -74,7 +76,14 @@ Route::post('/encuesta-ejecucion/{token}', [PublicExecutionSurveyController::cla
 Route::get('/encuesta-ejecucion/{token}/gracias', [PublicExecutionSurveyController::class, 'thanks'])
     ->name('execution-survey.public.thanks');
 
+// Verificación pública de diplomas (QR o código ingresado a mano).
+// Throttle para evitar que alguien pruebe códigos al azar.
+Route::get('/validar', [DiplomaController::class, 'verifyForm'])
+    ->middleware('throttle:30,1')
+    ->name('diplomas.verify');
+
 Route::get('/validar/{code}', [DiplomaController::class, 'validateCode'])
+    ->middleware('throttle:30,1')
     ->name('diplomas.validate');
 
 // Sirve archivos del disco "public" cuando el enlace public/storage no existe
@@ -193,6 +202,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/configuracion/otec-name', [SettingsController::class, 'updateOtecName'])
         ->name('settings.otec-name.update');
 
+    Route::post('/configuracion/diplomas', [SettingsController::class, 'updateDiploma'])
+        ->name('settings.diplomas.update');
+
+    Route::post('/configuracion/diplomas/logos', [DiplomaLogoController::class, 'store'])
+        ->name('settings.diploma-logos.store');
+
+    Route::delete('/configuracion/diplomas/logos/{diplomaLogo}', [DiplomaLogoController::class, 'destroy'])
+        ->name('settings.diploma-logos.destroy');
+
     Route::prefix('configuracion')->group(function () {
 
         Route::get('/usuarios', [UserManagementController::class, 'index'])
@@ -239,6 +257,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('diplomas/{diploma}/pdf', [DiplomaController::class, 'pdf'])
         ->name('diplomas.pdf');
+
+    Route::delete('diplomas', [DiplomaController::class, 'destroyMany'])
+        ->name('diplomas.destroy-many');
 
     Route::delete('diplomas/{diploma}', [DiplomaController::class, 'destroy'])
         ->name('diplomas.destroy');
@@ -409,6 +430,22 @@ Route::middleware('auth')->group(function () {
         '/executions/{execution}/survey/responses',
         [ExecutionSurveyAdminController::class, 'clearResponses']
     )->name('executions.survey.clear-responses');
+
+    /*
+|--------------------------------------------------------------------------
+| Informe de la ejecución
+|--------------------------------------------------------------------------
+*/
+
+    Route::put(
+        '/executions/{execution}/report',
+        [ExecutionReportController::class, 'update']
+    )->name('executions.report.update');
+
+    Route::get(
+        '/executions/{execution}/report/pdf',
+        [ExecutionReportController::class, 'pdf']
+    )->name('executions.report.pdf');
 
     /*
 |--------------------------------------------------------------------------

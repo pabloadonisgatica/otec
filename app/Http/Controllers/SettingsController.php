@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\UpdateDiplomaSettingsRequest;
 use App\Models\AppSetting;
+use App\Models\DiplomaLogo;
+use App\Services\DiplomaSettingsService;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 
 class SettingsController extends Controller
 {
-    public function index()
+    public function index(DiplomaSettingsService $diplomaSettings)
     {
         $breadcrumbs = [
             ['label' => 'Configuración', 'url' => route('settings.index')],
@@ -19,7 +22,25 @@ class SettingsController extends Controller
             ->orderBy('name')
             ->paginate(10);
 
-        return view('settings.index', compact('breadcrumbs', 'users'));
+        $diploma = $diplomaSettings->all();
+
+        $diplomaLogos = DiplomaLogo::orderBy('name')->get();
+
+        return view('settings.index', compact('breadcrumbs', 'users', 'diploma', 'diplomaLogos'));
+    }
+
+    public function updateDiploma(UpdateDiplomaSettingsRequest $request, DiplomaSettingsService $diplomaSettings)
+    {
+        $diplomaSettings->update(
+            $request->validated(),
+            $request->file('signature'),
+            $request->boolean('remove_signature')
+        );
+
+        return redirect()
+            ->route('settings.index')
+            ->with('settings_tab', 'diplomas')
+            ->with('status', 'Datos del diploma actualizados correctamente.');
     }
     public function updateLogo(Request $request)
     {

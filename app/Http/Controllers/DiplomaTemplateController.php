@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\DiplomaTemplate;
 use App\Services\DiplomaRenderer;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -126,12 +125,9 @@ class DiplomaTemplateController extends Controller
             'content_html' => ['required', 'string'],
         ]);
 
-        $content = $diplomaRenderer->renderPreview($request->input('content_html'));
-        $html = $diplomaRenderer->wrapDocument($content);
-
-        $pdf = Pdf::loadHTML($html)->setPaper('folio', 'landscape');
-
-        return $pdf->stream('vista-previa-diploma.pdf');
+        return $diplomaRenderer
+            ->toPdf($diplomaRenderer->renderPreview($request->input('content_html')))
+            ->stream('vista-previa-diploma.pdf');
     }
 
     /**

@@ -116,7 +116,8 @@ class ExecutionController extends Controller
         \App\Models\Execution $execution,
         \App\Services\PlanningValidationService $planningValidationService,
         \App\Services\SurveyService $surveyService,
-        \App\Services\ExecutionSurveyResultsService $executionSurveyResultsService
+        \App\Services\ExecutionSurveyResultsService $executionSurveyResultsService,
+        \App\Services\ExecutionReportService $executionReportService
     )
     {
         $execution->load([
@@ -153,6 +154,11 @@ class ExecutionController extends Controller
             ['label' => $execution->internal_code]
         ];
         $tab = request('tab', 'general');
+
+        $reportData = $tab === 'report'
+            ? $executionReportService->build($execution)
+            : null;
+
         return view('executions.show', compact(
             'execution',
             'participants',
@@ -164,7 +170,8 @@ class ExecutionController extends Controller
             'activeSurveyTemplates',
             'executionSurveyResults',
             'checklistItems',
-            'checklistResponses'
+            'checklistResponses',
+            'reportData'
         ));
     }
     /**

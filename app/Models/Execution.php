@@ -107,6 +107,14 @@ class Execution extends Model
         return $this->hasOne(ExecutionSurvey::class);
     }
 
+    /**
+     * Datos manuales del Informe de la ejecución.
+     */
+    public function report()
+    {
+        return $this->hasOne(ExecutionReport::class);
+    }
+
     public function checklistResponses()
     {
         return $this->hasMany(ExecutionChecklistResponse::class);
@@ -147,6 +155,23 @@ class Execution extends Model
     | Helpers
     |--------------------------------------------------------------------------
     */
+
+    /**
+     * IDs de participantes aprobados: nota final registrada igual o
+     * superior a la nota mínima del curso (4.0 si no está definida).
+     * Misma regla que usa la emisión de diplomas.
+     */
+    public function approvedParticipantIds(): \Illuminate\Support\Collection
+    {
+        $this->loadMissing(['evaluations', 'course']);
+
+        $minGrade = $this->course->min_grade ?? 4.0;
+
+        return $this->evaluations
+            ->filter(fn ($evaluation) => $evaluation->final_grade !== null
+                && $evaluation->final_grade >= $minGrade)
+            ->pluck('participant_id');
+    }
 
     public function isFinalized(): bool
     {

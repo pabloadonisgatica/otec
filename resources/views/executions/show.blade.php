@@ -159,6 +159,15 @@
 
                     </a>
 
+                    <a href="{{ route('executions.show', [$execution, 'tab' => 'report']) }}"
+                        class="py-3 border-b-2 {{ $tab == 'report'
+                ? 'border-indigo-600 text-indigo-600 font-semibold'
+                : 'border-transparent text-gray-500 hover:text-gray-700' }}">
+
+                        Informe
+
+                    </a>
+
                 </nav>
 
             </div>
@@ -210,6 +219,12 @@
             @if($tab == 'checklist')
 
             @include('executions.partials.checklist')
+
+            @endif
+
+            @if($tab == 'report')
+
+            @include('executions.partials.report')
 
             @endif
 

@@ -36,17 +36,35 @@
 
                         <input type="hidden" name="execution_id" value="{{ $selectedExecutionId }}">
 
-                        <div>
-                            <label class="block text-sm font-medium">Plantilla</label>
-                            <select name="template_id"
-                                    class="mt-1 w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
-                                    required>
-                                <option value="">Selecciona una plantilla…</option>
-                                @foreach($templates as $t)
-                                    <option value="{{ $t->id }}" @selected(old('template_id') == $t->id)>{{ $t->name }}</option>
+                        <div x-data="{ logo: '{{ old('diploma_logo_id', '') }}' }">
+                            <label class="block text-sm font-medium">Logo adicional</label>
+                            <p class="text-xs text-gray-500">El logo de la OTEC va siempre. Puedes agregar un segundo logo.</p>
+
+                            <div class="mt-2 flex flex-wrap gap-3">
+                                <label class="flex h-20 w-36 cursor-pointer items-center justify-center rounded-md border-2 text-sm"
+                                       :class="logo === '' ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 text-gray-500 hover:border-gray-300'">
+                                    <input type="radio" name="diploma_logo_id" value="" class="sr-only" x-model="logo">
+                                    Ninguno
+                                </label>
+
+                                @foreach($diplomaLogos as $logo)
+                                    <label class="flex h-20 w-36 cursor-pointer flex-col items-center justify-center gap-1 rounded-md border-2 p-2"
+                                           :class="logo === '{{ $logo->id }}' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:border-gray-300'">
+                                        <input type="radio" name="diploma_logo_id" value="{{ $logo->id }}" class="sr-only" x-model="logo">
+                                        <img src="{{ $logo->url() }}" alt="{{ $logo->name }}" class="max-h-10 max-w-28 object-contain">
+                                        <span class="text-xs text-gray-600">{{ $logo->name }}</span>
+                                    </label>
                                 @endforeach
-                            </select>
-                            @error('template_id') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                            </div>
+
+                            @if($diplomaLogos->isEmpty())
+                                <p class="mt-2 text-xs text-gray-500">
+                                    No hay logos adicionales cargados. Se agregan en
+                                    <a href="{{ route('settings.index') }}" class="underline">Configuración → Diplomas → Logos</a>.
+                                </p>
+                            @endif
+
+                            @error('diploma_logo_id') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>

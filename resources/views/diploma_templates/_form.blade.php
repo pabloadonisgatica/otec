@@ -48,7 +48,8 @@
             Variables disponibles: <code>{{participant.full_name}}</code>, <code>{{participant.rut}}</code>,
             <code>{{course.name}}</code>, <code>{{course.hours}}</code>,
             <code>{{execution.start_date}}</code>, <code>{{execution.end_date}}</code>, <code>{{execution.company}}</code>,
-            <code>{{code}}</code>, <code>{{issued_at}}</code>, <code>{{qr}}</code> (código QR de validación).
+            <code>{{code}}</code>, <code>{{issued_at}}</code>, <code>{{qr}}</code> (código QR de validación),
+            <code>{{validation_url}}</code> (link de verificación). Tamaño de página: carta horizontal (11 × 8,5 in).
         @endverbatim
     </p>
         </div>

@@ -39,12 +39,24 @@
                     </p>
                 </div>
 
-                @if($diploma->qr_path)
-                    <div>
-                        <p class="text-sm text-gray-500 mb-2">Código QR de validación</p>
-                        <img src="{{ Storage::url($diploma->qr_path) }}" alt="QR" class="h-32 w-32 border rounded-lg p-2">
+                <div>
+                    <p class="text-sm text-gray-500 mb-2">Verificación</p>
+                    <div class="flex items-start gap-4" x-data="{ copied: false }">
+                        <img src="{{ $qrDataUri }}" alt="QR de verificación" class="h-32 w-32 border rounded-lg p-2">
+                        <div class="text-sm space-y-2 min-w-0">
+                            <a href="{{ $validationUrl }}" target="_blank"
+                               class="block text-indigo-600 hover:underline break-all">{{ $validationUrl }}</a>
+                            <button type="button"
+                                    @click="navigator.clipboard.writeText('{{ $validationUrl }}'); copied = true; setTimeout(() => copied = false, 2000)"
+                                    class="px-3 py-1.5 rounded-lg border border-gray-300 text-xs text-gray-700 hover:bg-gray-50"
+                                    x-text="copied ? 'Copiado' : 'Copiar link'"></button>
+                            <p class="text-xs text-gray-400">
+                                El QR del diploma lleva a este link. También se puede verificar ingresando el código en
+                                <a href="{{ route('diplomas.verify') }}" target="_blank" class="underline">{{ route('diplomas.verify') }}</a>.
+                            </p>
+                        </div>
                     </div>
-                @endif
+                </div>
 
                 <div class="flex gap-3 pt-4 border-t">
                     <a href="{{ route('diplomas.pdf', $diploma) }}" target="_blank"
