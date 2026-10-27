@@ -6,6 +6,7 @@ use App\Enums\QuestionnaireType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
@@ -57,6 +58,22 @@ class Questionnaire extends Model
         static::creating(function (Questionnaire $questionnaire) {
             $questionnaire->token ??= Str::random(32);
         });
+    }
+
+    public function sections(): HasMany
+    {
+        return $this->hasMany(QuestionnaireSection::class)->orderBy('sort_order');
+    }
+
+    public function questions(): HasMany
+    {
+        return $this->hasMany(QuestionnaireQuestion::class);
+    }
+
+    /** Solo las encuestas libres tienen constructor; los instrumentos son fijos. */
+    public function hasBuilder(): bool
+    {
+        return ! $this->type->isInstrument();
     }
 
     public function company(): BelongsTo

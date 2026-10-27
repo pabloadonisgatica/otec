@@ -62,7 +62,12 @@
                                             <a href="{{ route('questionnaires.edit', $questionnaire) }}" class="font-medium text-gray-900 hover:text-indigo-700">
                                                 {{ $questionnaire->name }}
                                             </a>
-                                            <div class="text-xs text-gray-500">{{ $questionnaire->type->label() }}</div>
+                                            <div class="text-xs text-gray-500">
+                                                {{ $questionnaire->type->label() }}
+                                                @if ($questionnaire->hasBuilder())
+                                                    · {{ $questionnaire->questions_count }} {{ $questionnaire->questions_count === 1 ? 'pregunta' : 'preguntas' }}
+                                                @endif
+                                            </div>
                                         </td>
                                         <td class="py-3 pr-4 text-gray-600">{{ $questionnaire->associationLabel() ?? '—' }}</td>
                                         <td class="py-3 pr-4">
@@ -72,7 +77,15 @@
                                         </td>
                                         <td class="py-3 pr-4 text-gray-600 whitespace-nowrap">{{ $questionnaire->closesAtLocal() ?? 'Sin cierre' }}</td>
                                         <td class="py-3 pr-4 text-right whitespace-nowrap">
+                                            @if ($questionnaire->hasBuilder())
+                                                <a href="{{ route('questionnaires.builder.edit', $questionnaire) }}" class="text-indigo-600 hover:underline mr-3">Preguntas</a>
+                                            @endif
                                             <a href="{{ route('questionnaires.edit', $questionnaire) }}" class="text-indigo-600 hover:underline mr-3">Editar</a>
+
+                                            <form action="{{ route('questionnaires.duplicate', $questionnaire) }}" method="POST" class="inline">
+                                                @csrf
+                                                <button class="text-gray-600 hover:underline mr-3">Duplicar</button>
+                                            </form>
 
                                             <form action="{{ route('questionnaires.destroy', $questionnaire) }}" method="POST" class="inline"
                                                   onsubmit="return confirm('¿Eliminar esta encuesta? Su link dejará de funcionar.')">

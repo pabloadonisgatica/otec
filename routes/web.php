@@ -44,6 +44,7 @@ use App\Http\Controllers\QualityInternalTrainingController;
 use App\Http\Controllers\QualityChecklistController;
 use App\Http\Controllers\SurveyTemplateController;
 use App\Http\Controllers\QuestionnaireController;
+use App\Http\Controllers\QuestionnaireBuilderController;
 use App\Http\Controllers\ExecutionSurveyTemplateController;
 use App\Http\Controllers\PublicExecutionSurveyController;
 use App\Http\Controllers\ExecutionSurveyExportController;
@@ -200,6 +201,15 @@ Route::middleware('auth')->group(function () {
         ->parameters(['encuestas' => 'questionnaire'])
         ->names('questionnaires')
         ->except('show');
+
+    Route::get('encuestas/{questionnaire}/preguntas', [QuestionnaireBuilderController::class, 'edit'])
+        ->name('questionnaires.builder.edit');
+
+    Route::put('encuestas/{questionnaire}/preguntas', [QuestionnaireBuilderController::class, 'update'])
+        ->name('questionnaires.builder.update');
+
+    Route::post('encuestas/{questionnaire}/duplicar', [QuestionnaireController::class, 'duplicate'])
+        ->name('questionnaires.duplicate');
 
     Route::resource('plantillas-encuestas', SurveyTemplateController::class)
         ->parameters(['plantillas-encuestas' => 'survey_template'])

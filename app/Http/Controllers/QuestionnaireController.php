@@ -29,6 +29,7 @@ class QuestionnaireController extends Controller
 
         $questionnaires = Questionnaire::query()
             ->with(['company:id,name', 'course:id,name', 'execution:id,internal_code,course_name'])
+            ->withCount('questions')
             ->listFilters($search, $status, $type)
             ->latest()
             ->paginate(20)
@@ -61,9 +62,10 @@ class QuestionnaireController extends Controller
             $request->file('banner')
         );
 
+        // Las libres siguen directo al constructor de preguntas.
         return redirect()
-            ->route('questionnaires.edit', $questionnaire)
-            ->with('success', 'Encuesta creada.');
+            ->route($questionnaire->hasBuilder() ? 'questionnaires.builder.edit' : 'questionnaires.edit', $questionnaire)
+            ->with('success', $questionnaire->hasBuilder() ? 'Encuesta creada. Ahora agrega las preguntas.' : 'Encuesta creada.');
     }
 
     public function edit(Questionnaire $questionnaire)
@@ -83,6 +85,15 @@ class QuestionnaireController extends Controller
         return redirect()
             ->route('questionnaires.edit', $questionnaire)
             ->with('success', 'Encuesta actualizada.');
+    }
+
+    public function duplicate(Questionnaire $questionnaire)
+    {
+        $copy = $this->questionnaires->duplicate($questionnaire);
+
+        return redirect()
+            ->route('questionnaires.edit', $copy)
+            ->with('success', 'Encuesta duplicada. Revisa el nombre y la fecha de cierre.');
     }
 
     public function destroy(Questionnaire $questionnaire)

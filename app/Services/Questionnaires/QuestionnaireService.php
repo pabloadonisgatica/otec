@@ -6,11 +6,17 @@ use App\Enums\QuestionnaireType;
 use App\Models\Questionnaire;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class QuestionnaireService
 {
     private const BANNER_DIRECTORY = 'questionnaire-banners';
+
+    public function __construct(private QuestionnaireBuilder $builder)
+    {
+    }
 
     /**
      * Crea o actualiza los datos generales de una encuesta.
@@ -40,6 +46,29 @@ class QuestionnaireService
         $questionnaire->save();
 
         return $questionnaire;
+    }
+
+    /**
+     * Copia una encuesta con sus preguntas y un link nuevo. Sin respuestas
+     * y sin fecha de cierre (la original probablemente ya pasó).
+     */
+    public function duplicate(Questionnaire $original): Questionnaire
+    {
+        return DB::transaction(function () use ($original) {
+            $copy = $original->replicate(['token', 'closes_at', 'banner_path']);
+            $copy->name = mb_substr('Copia de ' . $original->name, 0, 255);
+
+            if ($original->banner_path && Storage::disk('public')->exists($original->banner_path)) {
+                $copy->banner_path = self::BANNER_DIRECTORY . '/' . Str::random(40) . '.' . pathinfo($original->banner_path, PATHINFO_EXTENSION);
+                Storage::disk('public')->copy($original->banner_path, $copy->banner_path);
+            }
+
+            $copy->save();
+
+            $this->builder->copy($original, $copy);
+
+            return $copy;
+        });
     }
 
     public function delete(Questionnaire $questionnaire): void
