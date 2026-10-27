@@ -17,18 +17,25 @@
 
             <x-breadcrumb :items="$breadcrumbs" />
 
-            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
+            @include('participants.import._steps', ['current' => 1])
+
+            <x-ui.card>
                 <div class="p-6 space-y-6">
 
-                    <div class="text-sm text-gray-700">
-                        <p class="font-semibold mb-2">Formato CSV</p>
-                        <pre class="p-3 bg-gray-100 rounded text-xs">rut,first_name,last_name,email,phone,status</pre>
-                        <p class="mt-2 text-gray-600">
-                            La empresa se selecciona aquí. El archivo no incluye empresa.
+                    <div class="text-sm text-gray-700 space-y-2">
+                        <p>
+                            Sube el Excel o CSV tal como lo tengas, por ejemplo el que envía el cliente.
+                            <strong>No necesita un formato especial:</strong> en el siguiente paso indicas qué columna es cada dato.
+                        </p>
+                        <p class="text-gray-500">
+                            Se necesitan al menos RUT, nombres y apellidos. Correo y teléfono son opcionales.
+                            Máximo {{ $maxRows }} filas por carga.
+                            <a href="{{ route('participants.import.template') }}" class="text-indigo-700 underline hover:text-indigo-900">Descargar plantilla Excel (opcional)</a>
                         </p>
                     </div>
 
-                    <form method="POST" action="{{ route('participants.import') }}" enctype="multipart/form-data" class="space-y-4">
+                    <form method="POST" action="{{ route('participants.import') }}" enctype="multipart/form-data" class="space-y-4"
+                          x-data="{ busy: false }" @submit="busy = true">
                         @csrf
 
                         <div>
@@ -41,12 +48,13 @@
                                     </option>
                                 @endforeach
                             </select>
+                            <p class="mt-1 text-xs text-gray-500">Todos los participantes del archivo quedan asociados a esta empresa.</p>
                             @error('company_id') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Archivo CSV *</label>
-                            <input type="file" name="file" accept=".csv" class="mt-1 block w-full text-sm" required>
+                            <label class="block text-sm font-medium text-gray-700">Archivo Excel o CSV *</label>
+                            <input type="file" name="file" accept=".xlsx,.xls,.csv" class="mt-1 block w-full text-sm" required>
                             @error('file') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
                         </div>
 
@@ -56,15 +64,16 @@
                                 Cancelar
                             </a>
 
-                            <button type="submit"
-                                    class="px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-500">
-                                Importar
+                            <button type="submit" :disabled="busy"
+                                    class="px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50"
+                                    x-text="busy ? 'Leyendo archivo…' : 'Continuar'">
+                                Continuar
                             </button>
                         </div>
                     </form>
 
                 </div>
-            </div>
+            </x-ui.card>
         </div>
     </div>
 </x-app-layout>

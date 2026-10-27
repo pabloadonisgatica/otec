@@ -9,6 +9,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ParticipantController;
+use App\Http\Controllers\ParticipantImportController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\SettingsController;
@@ -147,11 +148,35 @@ Route::middleware('auth')->group(function () {
     Route::get('participants/{participant}/json', [ParticipantController::class, 'json'])
         ->name('participants.json');
 
-    Route::get('participants/import', [ParticipantController::class, 'importForm'])
+    // Carga masiva en 3 pasos: subir → columnas → revisar (ParticipantImportController)
+    Route::get('participants/import', [ParticipantImportController::class, 'create'])
         ->name('participants.import.form');
 
-    Route::post('participants/import', [ParticipantController::class, 'import'])
+    Route::post('participants/import', [ParticipantImportController::class, 'upload'])
         ->name('participants.import');
+
+    Route::get('participants/import/template', [ParticipantImportController::class, 'template'])
+        ->name('participants.import.template');
+
+    Route::get('participants/import/{token}/columns', [ParticipantImportController::class, 'columns'])
+        ->whereUuid('token')
+        ->name('participants.import.columns');
+
+    Route::post('participants/import/{token}/columns', [ParticipantImportController::class, 'saveColumns'])
+        ->whereUuid('token')
+        ->name('participants.import.columns.save');
+
+    Route::get('participants/import/{token}/review', [ParticipantImportController::class, 'review'])
+        ->whereUuid('token')
+        ->name('participants.import.review');
+
+    Route::get('participants/import/{token}/errors', [ParticipantImportController::class, 'errors'])
+        ->whereUuid('token')
+        ->name('participants.import.errors');
+
+    Route::post('participants/import/{token}/confirm', [ParticipantImportController::class, 'confirm'])
+        ->whereUuid('token')
+        ->name('participants.import.confirm');
 
     Route::resource('participants', ParticipantController::class);
 

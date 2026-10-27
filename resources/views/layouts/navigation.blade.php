@@ -77,7 +77,21 @@
             </div>
 
             <!-- Perfil (Configuración + Profile + Logout) -->
-            <div class="hidden sm:flex sm:items-center">
+            <div class="hidden sm:flex sm:items-center sm:gap-1">
+
+                {{-- Modo claro / oscuro --}}
+                <button type="button"
+                        x-data="{ dark: document.documentElement.classList.contains('dark') }"
+                        @click="dark = window.toggleTheme()"
+                        :title="dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+                        class="p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none transition">
+                    <svg x-show="! dark" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                    </svg>
+                    <svg x-show="dark" x-cloak class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                </button>
 
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
@@ -203,6 +217,14 @@
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
+
+                <button type="button"
+                        x-data="{ dark: document.documentElement.classList.contains('dark') }"
+                        @click="dark = window.toggleTheme()"
+                        class="block w-full ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:outline-none transition"
+                        x-text="dark ? 'Modo claro' : 'Modo oscuro'">
+                    Modo oscuro
+                </button>
 
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">

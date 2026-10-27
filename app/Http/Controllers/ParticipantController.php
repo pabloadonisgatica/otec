@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\Participant;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class ParticipantController extends Controller
 {
@@ -126,105 +125,4 @@ class ParticipantController extends Controller
             'notes' => $participant->notes,
         ]);
     }
-
-public function importForm()
-{
-    $companies = Company::orderBy('name')->get(['id', 'name']);
-
-    $breadcrumbs = [
-        ['label' => 'Participantes', 'url' => route('participants.index')],
-        ['label' => 'Carga masiva', 'url' => null],
-    ];
-
-    return view('participants.import', compact('companies', 'breadcrumbs'));
-}
-
-public function import(Request $request)
-{
-    $request->validate([
-        'company_id' => ['required', 'exists:companies,id'],
-        'file' => ['required', 'file', 'mimes:csv,txt'],
-    ]);
-
-    $companyId = (int) $request->company_id;
-
-    $handle = fopen($request->file('file')->getRealPath(), 'r');
-    if (!$handle) {
-        return back()->withErrors(['file' => 'No se pudo leer el archivo.']);
-    }
-
-    $header = fgetcsv($handle);
-    if (!$header) {
-        return back()->withErrors(['file' => 'El CSV está vacío.']);
-    }
-
-    // Esperamos encabezado exacto
-    $expected = ['rut','first_name','last_name','email','phone','status'];
-    $headerNorm = array_map(fn($h) => trim(strtolower($h)), $header);
-
-    if ($headerNorm !== $expected) {
-        return back()->withErrors([
-            'file' => 'Encabezado inválido. Debe ser: rut,first_name,last_name,email,phone,status'
-        ]);
-    }
-
-    $created = 0;
-    $skipped = 0;
-
-    DB::beginTransaction();
-    try {
-        while (($row = fgetcsv($handle)) !== false) {
-            if (count($row) === 0) continue;
-
-            $data = array_combine($expected, $row);
-
-            $rut = trim((string)($data['rut'] ?? ''));
-            $first = trim((string)($data['first_name'] ?? ''));
-            $last = trim((string)($data['last_name'] ?? ''));
-            $email = trim((string)($data['email'] ?? '')) ?: null;
-            $phone = trim((string)($data['phone'] ?? '')) ?: null;
-            $status = trim((string)($data['status'] ?? '')) ?: 'activo';
-
-            // mínimos
-            if ($rut === '' || $first === '' || $last === '') {
-                $skipped++;
-                continue;
-            }
-
-            // duplicado por RUT
-            if (Participant::where('rut', $rut)->exists()) {
-                $skipped++;
-                continue;
-            }
-
-            if (!in_array($status, ['activo','inactivo'], true)) {
-                $status = 'activo';
-            }
-
-            Participant::create([
-                'rut' => $rut,
-                'first_name' => $first,
-                'last_name' => $last,
-                'email' => $email,
-                'phone' => $phone,
-                'status' => $status,
-                'company_id' => $companyId,
-            ]);
-
-            $created++;
-        }
-
-        DB::commit();
-    } catch (\Throwable $e) {
-        DB::rollBack();
-        throw $e;
-    } finally {
-        fclose($handle);
-    }
-
-    return redirect()
-        ->route('participants.index')
-        ->with('success', "Carga completada: {$created} creados, {$skipped} omitidos/duplicados.");
-}
-
 }

@@ -1,3 +1,109 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+[x-cloak] { display: none !important; }
+
+/*
+|--------------------------------------------------------------------------
+| Modo oscuro (solo panel interno, layouts/app.blade.php)
+|--------------------------------------------------------------------------
+| No usa variantes dark: en cada vista: reasigna la paleta clara que ya
+| usan las 160+ vistas. Se activa con la clase "dark" en <html>.
+| Si una vista nueva usa un color que no está aquí, se ve en su versión
+| clara: agrégalo en esta lista.
+*/
+html.dark { color-scheme: dark; }
+html.dark body { background-color: #0f141c; }
+
+/* Superficies */
+html.dark .min-h-screen.bg-gray-100 { background-color: #0f141c; }
+html.dark .bg-white { background-color: #1a212c; }
+html.dark .bg-gray-50, html.dark .bg-gray-50\/60 { background-color: #161c26; }
+html.dark .bg-gray-100 { background-color: #242c38; }
+html.dark .bg-gray-200, html.dark .bg-gray-300 { background-color: #2e3744; }
+
+/* Texto */
+html.dark .text-black, html.dark .text-gray-900 { color: #f3f4f6; }
+html.dark .text-gray-800 { color: #e5e7eb; }
+html.dark .text-gray-700 { color: #d1d5db; }
+html.dark .text-gray-600 { color: #b6bcc6; }
+html.dark .text-gray-500 { color: #9aa1ad; }
+html.dark .text-gray-400 { color: #7c8492; }
+html.dark .text-gray-300 { color: #4b5563; }
+html.dark .text-black\/50 { color: rgba(243, 244, 246, .5); }
+
+/* Bordes y divisores */
+html.dark .border-gray-50, html.dark .border-gray-100 { border-color: #232b37; }
+html.dark .border-gray-200 { border-color: #2c3542; }
+html.dark .border-gray-300 { border-color: #3d4756; }
+html.dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: #2c3542; }
+html.dark .ring-gray-300 { --tw-ring-color: #3d4756; }
+html.dark .ring-black { --tw-ring-color: rgba(255, 255, 255, .08); }
+
+/* Fondos de color suaves (alertas, badges, estados) */
+html.dark .bg-indigo-50, html.dark .bg-indigo-50\/40 { background-color: rgba(99, 102, 241, .14); }
+html.dark .bg-green-50 { background-color: rgba(34, 197, 94, .12); }
+html.dark .bg-green-100 { background-color: rgba(34, 197, 94, .2); }
+html.dark .bg-red-50, html.dark .bg-red-50\/50 { background-color: rgba(239, 68, 68, .12); }
+html.dark .bg-red-100 { background-color: rgba(239, 68, 68, .2); }
+html.dark .bg-amber-50, html.dark .bg-yellow-50 { background-color: rgba(245, 158, 11, .12); }
+html.dark .bg-amber-100 { background-color: rgba(245, 158, 11, .2); }
+html.dark .bg-blue-50 { background-color: rgba(59, 130, 246, .12); }
+html.dark .bg-purple-50 { background-color: rgba(168, 85, 247, .12); }
+
+html.dark .border-indigo-100, html.dark .border-indigo-200 { border-color: rgba(129, 140, 248, .3); }
+html.dark .border-green-200 { border-color: rgba(74, 222, 128, .3); }
+html.dark .border-red-200, html.dark .border-red-300 { border-color: rgba(248, 113, 113, .35); }
+html.dark .border-amber-200, html.dark .border-amber-300, html.dark .border-yellow-200, html.dark .border-orange-300 { border-color: rgba(251, 191, 36, .3); }
+html.dark .border-blue-300 { border-color: rgba(147, 197, 253, .35); }
+
+/* Texto de color: tonos más claros para que se lean sobre oscuro */
+html.dark .text-indigo-600 { color: #8b93f8; }
+html.dark .text-indigo-700 { color: #a5b4fc; }
+html.dark .text-green-600 { color: #4ade80; }
+html.dark .text-green-700, html.dark .text-green-800 { color: #86efac; }
+html.dark .text-red-500, html.dark .text-red-600 { color: #f87171; }
+html.dark .text-red-700, html.dark .text-red-800 { color: #fca5a5; }
+html.dark .text-amber-600 { color: #fbbf24; }
+html.dark .text-amber-700, html.dark .text-amber-800, html.dark .text-yellow-700 { color: #fcd34d; }
+html.dark .text-orange-600 { color: #fb923c; }
+html.dark .text-blue-600, html.dark .text-blue-700 { color: #93c5fd; }
+html.dark .text-purple-700 { color: #d8b4fe; }
+
+/* Hover / focus */
+html.dark .hover\:bg-gray-50:hover, html.dark .focus\:bg-gray-50:focus,
+html.dark .hover\:bg-gray-100:hover, html.dark .focus\:bg-gray-100:focus { background-color: #242c38; }
+html.dark .hover\:bg-gray-200:hover { background-color: #2e3744; }
+html.dark .hover\:bg-indigo-50:hover, html.dark .hover\:bg-indigo-100:hover, html.dark .focus\:bg-indigo-100:focus { background-color: rgba(99, 102, 241, .2); }
+html.dark .hover\:bg-red-50:hover, html.dark .hover\:bg-red-200:hover { background-color: rgba(239, 68, 68, .2); }
+html.dark .hover\:bg-green-100:hover { background-color: rgba(34, 197, 94, .2); }
+html.dark .hover\:bg-amber-100:hover, html.dark .hover\:bg-orange-50:hover { background-color: rgba(245, 158, 11, .2); }
+html.dark .hover\:text-black:hover, html.dark .hover\:text-gray-900:hover,
+html.dark .hover\:text-gray-800:hover, html.dark .hover\:text-gray-700:hover,
+html.dark .focus\:text-gray-800:focus, html.dark .focus\:text-gray-700:focus { color: #f3f4f6; }
+html.dark .hover\:text-gray-500:hover, html.dark .focus\:text-gray-500:focus { color: #b6bcc6; }
+html.dark .hover\:text-indigo-900:hover, html.dark .focus\:text-indigo-800:focus { color: #c7d2fe; }
+html.dark .hover\:text-red-800:hover, html.dark .hover\:text-red-900:hover { color: #fecaca; }
+html.dark .hover\:text-green-800:hover { color: #bbf7d0; }
+html.dark .hover\:border-gray-300:hover, html.dark .focus\:border-gray-300:focus { border-color: #4b5563; }
+
+/* Formularios (el plugin @tailwindcss/forms los pinta blancos) */
+html.dark input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=submit]):not([type=button]),
+html.dark select,
+html.dark textarea {
+    background-color: #111720;
+    border-color: #3d4756;
+    color: #e5e7eb;
+}
+html.dark input::placeholder, html.dark textarea::placeholder { color: #6b7280; }
+html.dark input[type=checkbox], html.dark input[type=radio] { background-color: #111720; border-color: #4b5563; }
+html.dark input[type=checkbox]:checked, html.dark input[type=radio]:checked { background-color: currentColor; }
+html.dark input:disabled, html.dark select:disabled, html.dark textarea:disabled { background-color: #1a212c; color: #7c8492; }
+html.dark select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239aa1ad' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+}
+
+/* Logos e imágenes con fondo transparente: siguen visibles sobre oscuro */
+html.dark main img { background-color: #fff; border-radius: .25rem; }
