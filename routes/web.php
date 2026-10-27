@@ -43,6 +43,7 @@ use App\Http\Controllers\QualitySurveyController;
 use App\Http\Controllers\QualityInternalTrainingController;
 use App\Http\Controllers\QualityChecklistController;
 use App\Http\Controllers\SurveyTemplateController;
+use App\Http\Controllers\QuestionnaireController;
 use App\Http\Controllers\ExecutionSurveyTemplateController;
 use App\Http\Controllers\PublicExecutionSurveyController;
 use App\Http\Controllers\ExecutionSurveyExportController;
@@ -193,6 +194,12 @@ Route::middleware('auth')->group(function () {
     | Templates Encuestas
     |--------------------------------------------------------------------------
     */
+
+    // Módulo Encuestas (tipo SurveyMonkey). Distinto de las plantillas de encuestas de curso.
+    Route::resource('encuestas', QuestionnaireController::class)
+        ->parameters(['encuestas' => 'questionnaire'])
+        ->names('questionnaires')
+        ->except('show');
 
     Route::resource('plantillas-encuestas', SurveyTemplateController::class)
         ->parameters(['plantillas-encuestas' => 'survey_template'])

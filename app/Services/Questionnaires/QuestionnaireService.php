@@ -1,0 +1,83 @@
+<?php
+
+namespace App\Services\Questionnaires;
+
+use App\Enums\QuestionnaireType;
+use App\Models\Questionnaire;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
+
+class QuestionnaireService
+{
+    private const BANNER_DIRECTORY = 'questionnaire-banners';
+
+    /**
+     * Crea o actualiza los datos generales de una encuesta.
+     * Preguntas y respuestas se manejan aparte.
+     */
+    public function save(Questionnaire $questionnaire, array $data, ?UploadedFile $banner = null, bool $removeBanner = false): Questionnaire
+    {
+        if (! $questionnaire->exists) {
+            $questionnaire->type = QuestionnaireType::from($data['type']);
+        }
+
+        $association = $data['association'] ?? 'none';
+
+        $questionnaire->fill([
+            'name' => $data['name'],
+            'description' => $data['description'] ?? null,
+            'is_active' => (bool) ($data['is_active'] ?? false),
+            'closes_at' => $this->toUtc($data['closes_at'] ?? null),
+            'company_id' => $association === 'company' ? $data['company_id'] : null,
+            'course_id' => $association === 'course' ? $data['course_id'] : null,
+            'execution_id' => $association === 'execution' ? $data['execution_id'] : null,
+            'respondent_fields' => $this->respondentFields($questionnaire->type, $data['respondent_fields'] ?? []),
+        ]);
+
+        $this->syncBanner($questionnaire, $banner, $removeBanner);
+
+        $questionnaire->save();
+
+        return $questionnaire;
+    }
+
+    public function delete(Questionnaire $questionnaire): void
+    {
+        // Borrado lógico: las respuestas se conservan.
+        $questionnaire->delete();
+    }
+
+    /** Solo se guardan los campos que se piden. Los instrumentos usan los suyos. */
+    private function respondentFields(QuestionnaireType $type, array $input): array
+    {
+        if ($fixed = $type->fixedRespondentFields()) {
+            return $fixed;
+        }
+
+        return collect($input)
+            ->only(array_keys(Questionnaire::RESPONDENT_FIELDS))
+            ->filter(fn ($mode) => in_array($mode, ['optional', 'required'], true))
+            ->all();
+    }
+
+    /** "2026-11-30T18:00" en hora de Chile → UTC. */
+    private function toUtc(?string $value): ?Carbon
+    {
+        return $value ? Carbon::parse($value, Questionnaire::TIMEZONE)->utc() : null;
+    }
+
+    private function syncBanner(Questionnaire $questionnaire, ?UploadedFile $banner, bool $remove): void
+    {
+        $disk = Storage::disk('public');
+
+        if (($banner || $remove) && $questionnaire->banner_path) {
+            $disk->delete($questionnaire->banner_path);
+            $questionnaire->banner_path = null;
+        }
+
+        if ($banner) {
+            $questionnaire->banner_path = $banner->store(self::BANNER_DIRECTORY, 'public');
+        }
+    }
+}
