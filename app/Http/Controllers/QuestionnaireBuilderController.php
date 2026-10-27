@@ -26,6 +26,7 @@ class QuestionnaireBuilderController extends Controller
             'types' => QuestionnaireQuestion::TYPES,
             'choiceTypes' => QuestionnaireQuestion::CHOICE_TYPES,
             'scaleRanges' => QuestionnaireQuestion::SCALE_RANGES,
+            'responsesCount' => $questionnaire->responses()->count(),
             'breadcrumbs' => [
                 ['label' => 'Encuestas', 'url' => route('questionnaires.index')],
                 ['label' => $questionnaire->name],

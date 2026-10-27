@@ -29,7 +29,8 @@ class QuestionnaireController extends Controller
 
         $questionnaires = Questionnaire::query()
             ->with(['company:id,name', 'course:id,name', 'execution:id,internal_code,course_name'])
-            ->withCount('questions')
+            ->withCount(['questions', 'responses'])
+            ->withMax('responses', 'created_at')
             ->listFilters($search, $status, $type)
             ->latest()
             ->paginate(20)

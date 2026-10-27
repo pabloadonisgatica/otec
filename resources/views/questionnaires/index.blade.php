@@ -50,6 +50,7 @@
                                 <tr class="text-left border-b border-gray-200 text-gray-700">
                                     <th class="py-2 pr-4">Encuesta</th>
                                     <th class="py-2 pr-4">Asociada a</th>
+                                    <th class="py-2 pr-4">Respuestas</th>
                                     <th class="py-2 pr-4">Estado</th>
                                     <th class="py-2 pr-4">Cierre</th>
                                     <th class="py-2 pr-4"></th>
@@ -70,6 +71,14 @@
                                             </div>
                                         </td>
                                         <td class="py-3 pr-4 text-gray-600">{{ $questionnaire->associationLabel() ?? '—' }}</td>
+                                        <td class="py-3 pr-4 whitespace-nowrap">
+                                            <span class="font-medium text-gray-900">{{ $questionnaire->responses_count }}</span>
+                                            @if ($questionnaire->responses_max_created_at)
+                                                <div class="text-xs text-gray-500">
+                                                    última {{ \Illuminate\Support\Carbon::parse($questionnaire->responses_max_created_at, 'UTC')->timezone(\App\Models\Questionnaire::TIMEZONE)->format('d-m H:i') }}
+                                                </div>
+                                            @endif
+                                        </td>
                                         <td class="py-3 pr-4">
                                             <span class="px-2 py-1 rounded text-xs {{ $badges[$questionnaire->status()] }}">
                                                 {{ $questionnaire->statusLabel() }}
@@ -81,6 +90,7 @@
                                                 <a href="{{ route('questionnaires.builder.edit', $questionnaire) }}" class="text-indigo-600 hover:underline mr-3">Preguntas</a>
                                             @endif
                                             <a href="{{ route('questionnaires.edit', $questionnaire) }}" class="text-indigo-600 hover:underline mr-3">Editar</a>
+                                            <a href="{{ route('questionnaires.share', $questionnaire) }}" class="text-indigo-600 hover:underline mr-3">Compartir</a>
 
                                             <form action="{{ route('questionnaires.duplicate', $questionnaire) }}" method="POST" class="inline">
                                                 @csrf
@@ -97,7 +107,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="py-8 text-center text-gray-500">
+                                        <td colspan="6" class="py-8 text-center text-gray-500">
                                             @if ($search || $status || $type)
                                                 No hay encuestas con esos filtros.
                                             @else

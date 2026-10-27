@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 /**
@@ -68,6 +69,32 @@ class Questionnaire extends Model
     public function questions(): HasMany
     {
         return $this->hasMany(QuestionnaireQuestion::class);
+    }
+
+    public function responses(): HasMany
+    {
+        return $this->hasMany(QuestionnaireResponse::class);
+    }
+
+    /** Preguntas en el orden en que se muestran (sección y luego pregunta). */
+    public function orderedQuestions(): Collection
+    {
+        return $this->sections()->with('questions')->get()->flatMap->questions->values();
+    }
+
+    public function publicUrl(): string
+    {
+        return route('questionnaires.public.show', $this->token);
+    }
+
+    /** Por qué no recibe respuestas (para la página pública), o null si sí recibe. */
+    public function unavailableReason(): ?string
+    {
+        return match ($this->status()) {
+            'inactive' => 'Esta encuesta no está disponible en este momento.',
+            'closed' => 'Esta encuesta cerró el ' . $this->closesAtLocal() . ' y ya no recibe respuestas.',
+            default => null,
+        };
     }
 
     /** Solo las encuestas libres tienen constructor; los instrumentos son fijos. */

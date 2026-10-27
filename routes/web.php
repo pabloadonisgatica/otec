@@ -45,6 +45,8 @@ use App\Http\Controllers\QualityChecklistController;
 use App\Http\Controllers\SurveyTemplateController;
 use App\Http\Controllers\QuestionnaireController;
 use App\Http\Controllers\QuestionnaireBuilderController;
+use App\Http\Controllers\QuestionnaireShareController;
+use App\Http\Controllers\PublicQuestionnaireController;
 use App\Http\Controllers\ExecutionSurveyTemplateController;
 use App\Http\Controllers\PublicExecutionSurveyController;
 use App\Http\Controllers\ExecutionSurveyExportController;
@@ -78,6 +80,17 @@ Route::post('/encuesta-ejecucion/{token}', [PublicExecutionSurveyController::cla
 
 Route::get('/encuesta-ejecucion/{token}/gracias', [PublicExecutionSurveyController::class, 'thanks'])
     ->name('execution-survey.public.thanks');
+
+// Módulo Encuestas: link corto para compartir y para el QR (/e/{token}).
+Route::get('/e/{questionnaire:token}', [PublicQuestionnaireController::class, 'show'])
+    ->name('questionnaires.public.show');
+
+Route::post('/e/{questionnaire:token}', [PublicQuestionnaireController::class, 'store'])
+    ->middleware('throttle:120,10') // holgado: en una sala todos comparten la misma IP
+    ->name('questionnaires.public.store');
+
+Route::get('/e/{questionnaire:token}/gracias', [PublicQuestionnaireController::class, 'thanks'])
+    ->name('questionnaires.public.thanks');
 
 // Verificación pública de diplomas (QR o código ingresado a mano).
 // Throttle para evitar que alguien pruebe códigos al azar.
@@ -210,6 +223,15 @@ Route::middleware('auth')->group(function () {
 
     Route::post('encuestas/{questionnaire}/duplicar', [QuestionnaireController::class, 'duplicate'])
         ->name('questionnaires.duplicate');
+
+    Route::get('encuestas/{questionnaire}/compartir', [QuestionnaireShareController::class, 'show'])
+        ->name('questionnaires.share');
+
+    Route::get('encuestas/{questionnaire}/qr', [QuestionnaireShareController::class, 'downloadQr'])
+        ->name('questionnaires.qr.download');
+
+    Route::get('encuestas/{questionnaire}/qr/imprimir', [QuestionnaireShareController::class, 'printQr'])
+        ->name('questionnaires.qr.print');
 
     Route::resource('plantillas-encuestas', SurveyTemplateController::class)
         ->parameters(['plantillas-encuestas' => 'survey_template'])

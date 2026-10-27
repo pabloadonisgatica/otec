@@ -5,6 +5,8 @@
     if ($questionnaire->hasBuilder()) {
         $tabs['builder'] = ['Preguntas (' . $questionnaire->questions()->count() . ')', route('questionnaires.builder.edit', $questionnaire)];
     }
+
+    $tabs['share'] = ['Compartir', route('questionnaires.share', $questionnaire)];
 @endphp
 
 <div class="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-gray-200">

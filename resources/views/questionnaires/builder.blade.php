@@ -130,6 +130,14 @@
 
             @include('questionnaires._tabs', ['current' => 'builder'])
 
+            @if ($responsesCount > 0)
+                <div class="mb-6 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+                    <strong>Esta encuesta ya tiene {{ $responsesCount }} {{ $responsesCount === 1 ? 'respuesta' : 'respuestas' }}.</strong>
+                    Corregir textos no afecta los resultados. Si eliminas una pregunta, sus respuestas se conservan con el texto original.
+                    Evita cambiar el tipo o las opciones de preguntas ya respondidas: los resultados quedarían mezclados.
+                </div>
+            @endif
+
             @if ($errors->any())
                 <div class="mb-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                     <p class="font-medium">No se guardó. Revisa:</p>
