@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\DestroyDiplomasRequest;
+use App\Http\Requests\DownloadDiplomasRequest;
 use App\Http\Requests\StoreDiplomaRequest;
 use App\Models\AppSetting;
 use App\Models\Course;
@@ -12,9 +13,11 @@ use App\Models\DiplomaTemplate;
 use App\Models\Execution;
 use App\Services\DiplomaRenderer;
 use App\Services\DiplomaSnapshotBuilder;
+use App\Services\DiplomaZipBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class DiplomaController extends Controller
 {
@@ -29,22 +32,7 @@ class DiplomaController extends Controller
                 'execution:id,course_name,internal_code',
                 'participant:id,first_name,last_name,rut',
             ])
-            ->when($courseId, fn ($query) => $query->where('course_id', $courseId))
-            // Agrupado para que los "o" de la búsqueda no anulen el filtro de curso.
-            ->when($search, function ($query, $search) {
-                $query->where(function ($query) use ($search) {
-                    $query->where('code', 'like', "%{$search}%")
-                        ->orWhereHas('participant', function ($q) use ($search) {
-                            $q->where('first_name', 'like', "%{$search}%")
-                                ->orWhere('last_name', 'like', "%{$search}%")
-                                ->orWhere('rut', 'like', "%{$search}%");
-                        })
-                        ->orWhereHas('execution', function ($q) use ($search) {
-                            $q->where('course_name', 'like', "%{$search}%")
-                                ->orWhere('internal_code', 'like', "%{$search}%");
-                        });
-                });
-            })
+            ->listFilters($search ?: null, $courseId)
             ->latest()
             ->paginate(20)
             ->withQueryString();
@@ -55,7 +43,13 @@ class DiplomaController extends Controller
             ->orderBy('name')
             ->get(['id', 'name']);
 
-        return view('diplomas.index', compact('diplomas', 'search', 'courses', 'courseId'));
+        return view('diplomas.index', [
+            'diplomas' => $diplomas,
+            'search' => $search,
+            'courses' => $courses,
+            'courseId' => $courseId,
+            'maxDownload' => DiplomaZipBuilder::MAX_PER_DOWNLOAD,
+        ]);
     }
 
     public function create(Request $request)
@@ -178,6 +172,49 @@ class DiplomaController extends Controller
         return redirect()
             ->back()
             ->with('status', "Diplomas eliminados: {$diplomas->count()}. Puedes volver a emitirlos cuando quieras.");
+    }
+
+    /**
+     * Descarga masiva en ZIP: los seleccionados, o todos los del filtro actual.
+     */
+    public function download(DownloadDiplomasRequest $request, DiplomaZipBuilder $zipBuilder)
+    {
+        $query = Diploma::query()
+            ->with(['template', 'participant', 'execution:id,course_name,internal_code']);
+
+        if ($request->filled('diploma_ids')) {
+            $query->whereIn('id', $request->validated('diploma_ids'));
+        } else {
+            $query->listFilters(
+                $request->string('q')->trim()->toString() ?: null,
+                $request->integer('course_id') ?: null
+            );
+        }
+
+        $total = $query->count();
+
+        if ($total === 0) {
+            return back()->withErrors(['download' => 'No hay diplomas para descargar.']);
+        }
+
+        if ($total > DiplomaZipBuilder::MAX_PER_DOWNLOAD) {
+            return back()->withErrors([
+                'download' => "Son {$total} diplomas y el máximo por descarga es " . DiplomaZipBuilder::MAX_PER_DOWNLOAD
+                    . '. Filtra por curso o selecciona menos.',
+            ]);
+        }
+
+        $diplomas = $query->get();
+
+        try {
+            $path = $zipBuilder->build($diplomas);
+        } catch (RuntimeException $e) {
+            return back()->withErrors(['download' => $e->getMessage()]);
+        }
+
+        return response()
+            ->download($path, $zipBuilder->zipName($diplomas))
+            ->deleteFileAfterSend();
     }
 
     private function deleteDiploma(Diploma $diploma): void

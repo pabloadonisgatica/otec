@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -22,6 +23,31 @@ class Diploma extends Model
         'issued_at' => 'datetime',
         'snapshot'  => 'array',
     ];
+
+    /**
+     * Filtros del listado (búsqueda + curso). Lo usan el listado
+     * y la descarga masiva, para que ambos vean exactamente lo mismo.
+     * Los "o" de la búsqueda van agrupados para no anular el filtro de curso.
+     */
+    public function scopeListFilters(Builder $query, ?string $search, ?int $courseId): Builder
+    {
+        return $query
+            ->when($courseId, fn ($query) => $query->where('course_id', $courseId))
+            ->when($search, function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('code', 'like', "%{$search}%")
+                        ->orWhereHas('participant', function ($q) use ($search) {
+                            $q->where('first_name', 'like', "%{$search}%")
+                                ->orWhere('last_name', 'like', "%{$search}%")
+                                ->orWhere('rut', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('execution', function ($q) use ($search) {
+                            $q->where('course_name', 'like', "%{$search}%")
+                                ->orWhere('internal_code', 'like', "%{$search}%");
+                        });
+                });
+            });
+    }
 
     /**
      * RUT parcialmente oculto para la verificación pública

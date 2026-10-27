@@ -50,12 +50,6 @@
                             Sube el logo que se mostrará en la navegación del sistema.
                         </p>
 
-                        @if (session('status'))
-                            <div class="mt-4 p-3 rounded bg-green-50 text-green-700 text-sm">
-                                {{ session('status') }}
-                            </div>
-                        @endif
-
                         <form class="mt-6 space-y-4" action="{{ route('settings.logo.update') }}" method="POST" enctype="multipart/form-data">
                             @csrf
 
@@ -125,12 +119,6 @@
                                 </button>
                             </div>
 
-
-                        @if (session('status'))
-                            <div class="mt-4 p-3 rounded bg-green-50 text-green-700 text-sm">
-                                {{ session('status') }}
-                            </div>
-                        @endif
 
                             {{-- Sub-tab: Firma y código --}}
                             <div x-show="subtab === 'firma'" x-cloak class="mt-6">

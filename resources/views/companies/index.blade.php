@@ -22,12 +22,6 @@
                 <div class="p-6">
 
                     {{-- Mensaje --}}
-                    @if (session('status'))
-                        <div class="mb-4 p-3 rounded bg-green-50 text-green-700">
-                            {{ session('status') }}
-                        </div>
-                    @endif
-
                     {{-- Buscador --}}
                     <x-table.search
                         :value="$q"

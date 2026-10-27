@@ -8,12 +8,6 @@
 
             @include('quality._nav')
 
-            @if (session('status'))
-                <div class="mb-4 p-3 rounded bg-green-50 text-green-700">
-                    {{ session('status') }}
-                </div>
-            @endif
-
             <p class="text-sm text-gray-500 mb-4">
                 Vista consolidada de ambos tipos de evaluación de desempeño de Relatores: la que responden los
                 participantes (dentro de cada Ejecución) y la que registra la Gerencia. Cada fila es una

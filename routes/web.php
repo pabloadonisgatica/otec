@@ -258,6 +258,9 @@ Route::middleware('auth')->group(function () {
     Route::get('diplomas/{diploma}/pdf', [DiplomaController::class, 'pdf'])
         ->name('diplomas.pdf');
 
+    Route::post('diplomas/download', [DiplomaController::class, 'download'])
+        ->name('diplomas.download');
+
     Route::delete('diplomas', [DiplomaController::class, 'destroyMany'])
         ->name('diplomas.destroy-many');
 

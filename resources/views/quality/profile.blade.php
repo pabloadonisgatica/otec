@@ -11,12 +11,6 @@
                 ['label' => 'Requisitos Generales'],
             ]" />
 
-            @if (session('status'))
-                <div class="mb-4 p-3 rounded bg-green-50 text-green-700">
-                    {{ session('status') }}
-                </div>
-            @endif
-
             <div x-data="{ section: '{{ request('tab', 'general') }}' }">
 
                 <div class="flex gap-1 mb-6 border-b border-gray-200 overflow-x-auto">

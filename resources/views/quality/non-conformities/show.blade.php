@@ -35,12 +35,6 @@
 
             @include('quality._nav')
 
-            @if (session('status'))
-                <div class="p-3 rounded bg-green-50 text-green-700">
-                    {{ session('status') }}
-                </div>
-            @endif
-
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden p-6 space-y-4">
 
                 <div>

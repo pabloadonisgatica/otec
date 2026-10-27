@@ -11,12 +11,6 @@
                 ['label' => 'Planificación Estratégica'],
             ]" />
 
-            @if (session('status'))
-                <div class="mb-4 p-3 rounded bg-green-50 text-green-700">
-                    {{ session('status') }}
-                </div>
-            @endif
-
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 {{-- Documento --}}

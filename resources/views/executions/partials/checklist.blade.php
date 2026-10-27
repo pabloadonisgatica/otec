@@ -3,12 +3,6 @@
     $grouped = $checklistItems->groupBy('section');
 @endphp
 
-@if (session('status'))
-    <div class="mb-4 p-3 rounded bg-green-50 text-green-700">
-        {{ session('status') }}
-    </div>
-@endif
-
 <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
     <div class="p-6">
 

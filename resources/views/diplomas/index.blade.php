@@ -15,12 +15,6 @@
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-            @if (session('status'))
-                <div class="mb-4 p-3 rounded bg-green-50 text-green-700">
-                    {{ session('status') }}
-                </div>
-            @endif
-
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="p-6">
 
@@ -46,6 +40,34 @@
                         @endif
                     </form>
 
+                    {{-- Descargar todo lo que muestra el filtro actual --}}
+                    @if(($search || $courseId) && $diplomas->total() > 0)
+                        <div class="mb-4">
+                            @if($diplomas->total() <= $maxDownload)
+                                <form method="POST" action="{{ route('diplomas.download') }}"
+                                      x-data="{ busy: false }" @submit="busy = true; setTimeout(() => busy = false, 8000)">
+                                    @csrf
+                                    <input type="hidden" name="q" value="{{ $search }}">
+                                    <input type="hidden" name="course_id" value="{{ $courseId }}">
+                                    <button type="submit" :disabled="busy"
+                                            class="inline-flex items-center px-3 py-2 border border-indigo-200 rounded-md text-xs font-semibold uppercase tracking-widest text-indigo-700 hover:bg-indigo-50 disabled:opacity-50"
+                                            x-text="busy ? 'Generando ZIP…' : 'Descargar los {{ $diplomas->total() }} del filtro (ZIP)'">
+                                        Descargar los {{ $diplomas->total() }} del filtro (ZIP)
+                                    </button>
+                                </form>
+                            @else
+                                <p class="text-sm text-gray-500">
+                                    El filtro tiene {{ $diplomas->total() }} diplomas; la descarga masiva admite hasta {{ $maxDownload }}.
+                                    Acota la búsqueda o selecciona los que necesitas.
+                                </p>
+                            @endif
+                        </div>
+                    @endif
+
+                    @if($errors->has('download') || $errors->has('course_id'))
+                        <p class="mb-3 text-sm text-red-600">{{ $errors->first('download') ?: $errors->first('course_id') }}</p>
+                    @endif
+
                     <div x-data="{
                             selected: [],
                             pageIds: @js($diplomas->pluck('id')->map(fn ($id) => (string) $id)),
@@ -53,18 +75,36 @@
                             toggleAll() { this.selected = this.allSelected ? [] : [...this.pageIds]; }
                          }">
 
-                    {{-- Acción masiva (el formulario va fuera de la tabla; los checkboxes se asocian con form="") --}}
-                    <form id="bulk-delete-form" method="POST" action="{{ route('diplomas.destroy-many') }}"
-                          x-show="selected.length > 0" x-cloak
-                          @submit="if (! confirm('¿Eliminar ' + selected.length + ' diploma(s)? Podrás volver a emitirlos después.')) $event.preventDefault()"
-                          class="mb-3 flex items-center justify-between rounded-md border border-red-200 bg-red-50 px-4 py-2">
-                        @csrf
-                        @method('DELETE')
-                        <span class="text-sm text-red-800"><span x-text="selected.length"></span> seleccionado(s)</span>
-                        <button type="submit" class="text-xs font-semibold uppercase tracking-widest text-red-700 hover:text-red-900">
-                            Eliminar seleccionados
-                        </button>
-                    </form>
+                    {{-- Acciones masivas. Los checkboxes pertenecen al formulario de eliminar (form="");
+                         la descarga recibe los mismos ids como campos ocultos. --}}
+                    <div x-show="selected.length > 0" x-cloak
+                         class="mb-3 flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-4 py-2">
+                        <span class="text-sm text-gray-800"><span x-text="selected.length"></span> seleccionado(s)</span>
+
+                        <div class="flex items-center gap-5">
+                            <form method="POST" action="{{ route('diplomas.download') }}"
+                                  x-data="{ busy: false }" @submit="busy = true; setTimeout(() => busy = false, 8000)">
+                                @csrf
+                                <template x-for="id in selected" :key="id">
+                                    <input type="hidden" name="diploma_ids[]" :value="id">
+                                </template>
+                                <button type="submit" :disabled="busy"
+                                        class="text-xs font-semibold uppercase tracking-widest text-indigo-700 hover:text-indigo-900 disabled:opacity-50"
+                                        x-text="busy ? 'Generando ZIP…' : 'Descargar PDF (ZIP)'">
+                                    Descargar PDF (ZIP)
+                                </button>
+                            </form>
+
+                            <form id="bulk-delete-form" method="POST" action="{{ route('diplomas.destroy-many') }}"
+                                  @submit="if (! confirm('¿Eliminar ' + selected.length + ' diploma(s)? Podrás volver a emitirlos después.')) $event.preventDefault()">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-xs font-semibold uppercase tracking-widest text-red-700 hover:text-red-900">
+                                    Eliminar seleccionados
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                     @error('diploma_ids') <p class="mb-3 text-sm text-red-600">{{ $message }}</p> @enderror
 
                     <div class="overflow-x-auto">

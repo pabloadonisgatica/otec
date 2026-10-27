@@ -22,12 +22,6 @@
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="p-6">
 
-                    @if (session('status'))
-                        <div class="mb-4 p-3 rounded bg-green-50 text-green-700 text-sm">
-                            {{ session('status') }}
-                        </div>
-                    @endif
-
                     <div class="overflow-x-auto">
                         <table class="min-w-full text-sm">
                             <thead class="text-left text-gray-600 border-b">

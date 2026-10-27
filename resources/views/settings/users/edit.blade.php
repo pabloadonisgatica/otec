@@ -15,12 +15,6 @@
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="p-6">
 
-                    @if (session('status'))
-                        <div class="mb-4 p-3 rounded bg-green-50 text-green-700 text-sm">
-                            {{ session('status') }}
-                        </div>
-                    @endif
-
                     <form method="POST" action="{{ route('settings.users.update', $user) }}" enctype="multipart/form-data" class="space-y-6">
                         @csrf
                         @method('PUT')

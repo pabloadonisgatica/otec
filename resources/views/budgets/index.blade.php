@@ -23,12 +23,6 @@
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="p-6">
 
-                    @if (session('success'))
-                        <div class="mb-4 p-3 rounded bg-green-50 text-green-700">
-                            {{ session('success') }}
-                        </div>
-                    @endif
-
                     {{-- Search (si aún no implementas búsqueda, igual lo dejamos preparado) --}}
                     <x-table.search :value="$q ?? ''" placeholder="Buscar por nombre interno, empresa o curso…" />
 

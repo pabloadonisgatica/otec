@@ -17,12 +17,6 @@
     <div class="py-6">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
 
-            @if (session('status'))
-                <div class="mb-4 p-3 rounded bg-green-50 text-green-700">
-                    {{ session('status') }}
-                </div>
-            @endif
-
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="p-6">
                     <form action="{{ route('diploma-templates.update', $template) }}" method="POST" enctype="multipart/form-data">

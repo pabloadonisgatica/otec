@@ -57,12 +57,6 @@
 
             <x-breadcrumb :items="$breadcrumbs" />
 
-            @if (session('success'))
-                <div class="mb-4 p-3 rounded bg-green-50 text-green-700">
-                    {{ session('success') }}
-                </div>
-            @endif
-
 <form method="POST" action="{{ route('budgets.store') }}" x-data="budgetForm(@js($alpinePayload))" x-cloak>
     @csrf
 

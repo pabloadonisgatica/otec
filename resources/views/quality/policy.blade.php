@@ -11,12 +11,6 @@
                 ['label' => 'Política de Calidad'],
             ]" />
 
-            @if (session('status'))
-                <div class="mb-4 p-3 rounded bg-green-50 text-green-700">
-                    {{ session('status') }}
-                </div>
-            @endif
-
             {{-- Política --}}
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden p-6">
 

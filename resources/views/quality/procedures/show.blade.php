@@ -19,12 +19,6 @@
                 ['label' => $procedure->name],
             ]" />
 
-            @if (session('status'))
-                <div class="mb-4 p-3 rounded bg-green-50 text-green-700">
-                    {{ session('status') }}
-                </div>
-            @endif
-
             {{-- Información y control --}}
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden p-6 space-y-4">
 
