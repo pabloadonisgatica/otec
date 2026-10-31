@@ -72,7 +72,7 @@
                                         </td>
                                         <td class="py-3 pr-4 text-gray-600">{{ $questionnaire->associationLabel() ?? '—' }}</td>
                                         <td class="py-3 pr-4 whitespace-nowrap">
-                                            <span class="font-medium text-gray-900">{{ $questionnaire->responses_count }}</span>
+                                            <a href="{{ route('questionnaires.results.summary', $questionnaire) }}" class="font-medium text-indigo-700 hover:underline">{{ $questionnaire->responses_count }}</a>
                                             @if ($questionnaire->responses_max_created_at)
                                                 <div class="text-xs text-gray-500">
                                                     última {{ \Illuminate\Support\Carbon::parse($questionnaire->responses_max_created_at, 'UTC')->timezone(\App\Models\Questionnaire::TIMEZONE)->format('d-m H:i') }}

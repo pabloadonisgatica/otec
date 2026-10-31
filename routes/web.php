@@ -46,6 +46,7 @@ use App\Http\Controllers\SurveyTemplateController;
 use App\Http\Controllers\QuestionnaireController;
 use App\Http\Controllers\QuestionnaireBuilderController;
 use App\Http\Controllers\QuestionnaireShareController;
+use App\Http\Controllers\QuestionnaireResultsController;
 use App\Http\Controllers\PublicQuestionnaireController;
 use App\Http\Controllers\ExecutionSurveyTemplateController;
 use App\Http\Controllers\PublicExecutionSurveyController;
@@ -232,6 +233,24 @@ Route::middleware('auth')->group(function () {
 
     Route::get('encuestas/{questionnaire}/qr/imprimir', [QuestionnaireShareController::class, 'printQr'])
         ->name('questionnaires.qr.print');
+
+    Route::get('encuestas/{questionnaire}/resultados', [QuestionnaireResultsController::class, 'summary'])
+        ->name('questionnaires.results.summary');
+
+    Route::get('encuestas/{questionnaire}/resultados/csv', [QuestionnaireResultsController::class, 'export'])
+        ->name('questionnaires.results.export');
+
+    Route::get('encuestas/{questionnaire}/respuestas', [QuestionnaireResultsController::class, 'responses'])
+        ->name('questionnaires.results.responses');
+
+    Route::delete('encuestas/{questionnaire}/respuestas', [QuestionnaireResultsController::class, 'destroyAll'])
+        ->name('questionnaires.results.destroy-all');
+
+    Route::get('encuestas/{questionnaire}/respuestas/{response}', [QuestionnaireResultsController::class, 'show'])
+        ->name('questionnaires.results.show');
+
+    Route::delete('encuestas/{questionnaire}/respuestas/{response}', [QuestionnaireResultsController::class, 'destroy'])
+        ->name('questionnaires.results.destroy');
 
     Route::resource('plantillas-encuestas', SurveyTemplateController::class)
         ->parameters(['plantillas-encuestas' => 'survey_template'])

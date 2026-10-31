@@ -7,6 +7,7 @@
     }
 
     $tabs['share'] = ['Compartir', route('questionnaires.share', $questionnaire)];
+    $tabs['results'] = ['Resultados (' . $questionnaire->responses()->count() . ')', route('questionnaires.results.summary', $questionnaire)];
 @endphp
 
 <div class="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-gray-200">
