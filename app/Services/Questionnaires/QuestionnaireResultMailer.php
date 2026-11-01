@@ -26,6 +26,11 @@ class QuestionnaireResultMailer
                 ->bcc(config('questionnaires.results_bcc', []))
                 ->send(new QuestionnaireResultMail($response, $instrument));
 
+            // Con MAIL_MAILER=log o array el correo solo queda en el log: no cuenta como enviado.
+            if (in_array(config('mail.default'), ['log', 'array'], true)) {
+                return false;
+            }
+
             $response->forceFill(['result_emailed_at' => now()])->save();
 
             return true;

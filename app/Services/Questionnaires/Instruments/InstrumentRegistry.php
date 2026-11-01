@@ -14,6 +14,7 @@ class InstrumentRegistry
     {
         return match ($type) {
             QuestionnaireType::GroupEvaluation => new GroupEvaluationInstrument(),
+            QuestionnaireType::Leadership => new LeadershipInstrument(),
             default => null,
         };
     }
