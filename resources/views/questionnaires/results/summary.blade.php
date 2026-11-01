@@ -28,7 +28,7 @@
                 </div>
             </x-ui.card>
 
-            @if (! $questionnaire->hasBuilder())
+            @if (! $questionnaire->hasBuilder() && ! isset($summary['instrument']))
                 <x-ui.card>
                     <p class="p-6 text-sm text-gray-600">
                         Los resultados de este instrumento ({{ $questionnaire->type->label() }}) se habilitan junto con su formulario.
@@ -41,6 +41,8 @@
                         <a href="{{ route('questionnaires.share', $questionnaire) }}" class="text-indigo-700 underline">Compartir la encuesta</a>
                     </p>
                 </x-ui.card>
+            @elseif (isset($summary['instrument']))
+                @include('questionnaires.results.instruments.' . $questionnaire->type->value, ['data' => $summary['instrument']])
             @else
                 <div class="space-y-4">
                     @foreach ($summary['questions'] as $item)

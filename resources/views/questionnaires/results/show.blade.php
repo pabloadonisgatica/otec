@@ -29,13 +29,40 @@
                 </dl>
             </x-ui.card>
 
+            @if ($instrument && $response->result)
+                <x-ui.card>
+                    <div class="px-6 py-5">
+                        <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+                            <h3 class="text-sm font-semibold text-gray-900">{{ $instrument->title() }}</h3>
+                            <div class="flex items-center gap-3 text-sm">
+                                <span class="{{ $response->result_emailed_at ? 'text-gray-500' : 'text-amber-700' }}">
+                                    {{ $response->result_emailed_at
+                                        ? 'Correo enviado el ' . $response->result_emailed_at->copy()->timezone(\App\Models\Questionnaire::TIMEZONE)->format('d-m-Y H:i')
+                                        : 'El correo no se envió' }}
+                                </span>
+                                @if ($response->email)
+                                    <form method="POST" action="{{ route('questionnaires.results.resend', [$questionnaire, $response]) }}">
+                                        @csrf
+                                        <button type="submit" class="text-indigo-700 underline">
+                                            {{ $response->result_emailed_at ? 'Reenviar' : 'Enviar ahora' }}
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
+
+                        @include('questionnaires.instruments.' . $instrument->key() . '._scores', ['result' => $response->result])
+                    </div>
+                </x-ui.card>
+            @endif
+
             <x-ui.card>
                 <dl class="divide-y divide-gray-100">
                     @forelse ($answers as $answer)
                         <div class="px-6 py-4">
                             <dt class="text-sm font-medium text-gray-900">
                                 {{ $answer->question_label }}
-                                @unless ($answer->questionnaire_question_id)
+                                @unless ($answer->questionnaire_question_id || $instrument)
                                     <span class="ms-1 rounded bg-gray-100 px-2 py-0.5 text-xs font-normal text-gray-600">Pregunta eliminada</span>
                                 @endunless
                             </dt>

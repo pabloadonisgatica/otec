@@ -34,6 +34,10 @@ class SubmitQuestionnaireRequest extends FormRequest
             ]);
         }
 
+        if ($instrument = $this->questionnaire()->instrument()) {
+            return $rules + $instrument->rules();
+        }
+
         foreach ($this->questions() as $question) {
             $key = "answers.{$question->id}";
             $presence = $question->is_required ? 'required' : 'nullable';
@@ -80,6 +84,10 @@ class SubmitQuestionnaireRequest extends FormRequest
 
         foreach (Questionnaire::RESPONDENT_FIELDS as $field => $label) {
             $attributes["respondent.{$field}"] = mb_strtolower($label);
+        }
+
+        if ($instrument = $this->questionnaire()->instrument()) {
+            return $attributes + $instrument->attributes();
         }
 
         foreach ($this->questions()->values() as $index => $question) {

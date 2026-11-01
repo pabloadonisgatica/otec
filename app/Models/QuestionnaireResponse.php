@@ -15,10 +15,12 @@ class QuestionnaireResponse extends Model
         'email',
         'organization',
         'result',
+        'result_emailed_at',
     ];
 
     protected $casts = [
         'result' => 'array',
+        'result_emailed_at' => 'datetime',
     ];
 
     public function questionnaire(): BelongsTo

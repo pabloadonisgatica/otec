@@ -93,6 +93,9 @@ Route::post('/e/{questionnaire:token}', [PublicQuestionnaireController::class, '
 Route::get('/e/{questionnaire:token}/gracias', [PublicQuestionnaireController::class, 'thanks'])
     ->name('questionnaires.public.thanks');
 
+Route::get('/e/{questionnaire:token}/resultado', [PublicQuestionnaireController::class, 'result'])
+    ->name('questionnaires.public.result');
+
 // Verificación pública de diplomas (QR o código ingresado a mano).
 // Throttle para evitar que alguien pruebe códigos al azar.
 Route::get('/validar', [DiplomaController::class, 'verifyForm'])
@@ -251,6 +254,9 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('encuestas/{questionnaire}/respuestas/{response}', [QuestionnaireResultsController::class, 'destroy'])
         ->name('questionnaires.results.destroy');
+
+    Route::post('encuestas/{questionnaire}/respuestas/{response}/reenviar', [QuestionnaireResultsController::class, 'resend'])
+        ->name('questionnaires.results.resend');
 
     Route::resource('plantillas-encuestas', SurveyTemplateController::class)
         ->parameters(['plantillas-encuestas' => 'survey_template'])

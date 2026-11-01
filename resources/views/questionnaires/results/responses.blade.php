@@ -21,7 +21,7 @@
                                 <th class="px-4 py-3">N°</th>
                                 <th class="px-4 py-3">Fecha</th>
                                 <th class="px-4 py-3">Quién respondió</th>
-                                <th class="px-4 py-3">Respuestas</th>
+                                <th class="px-4 py-3">{{ $instrument ? 'Resultado' : 'Respuestas' }}</th>
                                 <th class="px-4 py-3"></th>
                             </tr>
                         </thead>
@@ -38,7 +38,16 @@
                                             <div class="text-xs text-gray-500">{{ collect([$response->email, $response->organization])->filter()->implode(' · ') }}</div>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-3 text-gray-700">{{ $response->answers_count }}</td>
+                                    <td class="px-4 py-3 text-gray-700">
+                                        @if ($instrument)
+                                            <span class="whitespace-nowrap">{{ $instrument->shortResult($response->result) }}</span>
+                                            <div class="text-xs {{ $response->result_emailed_at ? 'text-gray-500' : 'text-amber-700' }}">
+                                                {{ $response->result_emailed_at ? 'Correo enviado' : 'Correo no enviado' }}
+                                            </div>
+                                        @else
+                                            {{ $response->answers_count }}
+                                        @endif
+                                    </td>
                                     <td class="px-4 py-3 text-right whitespace-nowrap">
                                         <a href="{{ route('questionnaires.results.show', [$questionnaire, $response]) }}" class="text-indigo-600 hover:underline mr-3">Ver</a>
                                         <form method="POST" action="{{ route('questionnaires.results.destroy', [$questionnaire, $response]) }}" class="inline"

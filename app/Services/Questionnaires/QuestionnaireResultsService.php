@@ -6,6 +6,7 @@ use App\Models\Questionnaire;
 use App\Models\QuestionnaireAnswer;
 use App\Models\QuestionnaireQuestion;
 use App\Models\QuestionnaireResponse;
+use App\Services\Questionnaires\Instruments\Instrument;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -31,6 +32,16 @@ class QuestionnaireResultsService
      */
     public function summary(Questionnaire $questionnaire, ?Carbon $from, ?Carbon $to): array
     {
+        if ($instrument = $questionnaire->instrument()) {
+            $responses = $this->responsesQuery($questionnaire, $from, $to)->with('answers')->get();
+
+            return [
+                'total' => $responses->count(),
+                'questions' => [],
+                'instrument' => $instrument->summary($responses),
+            ];
+        }
+
         $responseIds = $this->responsesQuery($questionnaire, $from, $to)->pluck('id');
         $total = $responseIds->count();
 
@@ -74,6 +85,10 @@ class QuestionnaireResultsService
     public function export(Questionnaire $questionnaire, ?Carbon $from, ?Carbon $to): array
     {
         $respondentFields = array_intersect_key(Questionnaire::RESPONDENT_FIELDS, $questionnaire->respondentFields());
+
+        if ($instrument = $questionnaire->instrument()) {
+            return $this->exportInstrument($questionnaire, $instrument, $respondentFields, $from, $to);
+        }
         $questions = $questionnaire->orderedQuestions();
 
         // Columnas extra para preguntas eliminadas que tienen respuestas.
@@ -102,6 +117,24 @@ class QuestionnaireResultsService
                     array_map(fn ($field) => $response->{$field}, array_keys($respondentFields)),
                     $questions->map(fn ($q) => $this->csvValue($byQuestion->get($q->id)))->all(),
                     $deleted->map(fn ($label) => $this->csvValue($byDeletedLabel->get($label)))->all()
+                );
+            }
+        })();
+
+        return ['headers' => $headers, 'rows' => $rows];
+    }
+
+    private function exportInstrument(Questionnaire $questionnaire, Instrument $instrument, array $respondentFields, ?Carbon $from, ?Carbon $to): array
+    {
+        $headers = array_merge(['N°', 'Fecha'], array_values($respondentFields), $instrument->exportHeaders(), ['Correo enviado']);
+
+        $rows = (function () use ($questionnaire, $instrument, $respondentFields, $from, $to) {
+            foreach ($this->responsesQuery($questionnaire, $from, $to)->with('answers')->lazyById(200) as $response) {
+                yield array_merge(
+                    [$response->id, $response->submittedAtLocal()],
+                    array_map(fn ($field) => $response->{$field}, array_keys($respondentFields)),
+                    $instrument->exportRow($response),
+                    [$response->result_emailed_at ? 'Sí' : 'No']
                 );
             }
         })();

@@ -5,21 +5,37 @@ namespace App\Http\Controllers;
 use App\Http\Requests\SubmitQuestionnaireRequest;
 use App\Models\AppSetting;
 use App\Models\Questionnaire;
+use App\Models\QuestionnaireResponse;
 use App\Services\Questionnaires\QuestionnaireResponseService;
+use App\Services\Questionnaires\QuestionnaireResultMailer;
 
 /**
  * Página pública de una encuesta (sin login, identificada por token).
  */
 class PublicQuestionnaireController extends Controller
 {
-    public function __construct(private QuestionnaireResponseService $responses)
-    {
+    /** Sesión: respuesta recién enviada por token, para mostrar su resultado (PRG). */
+    private const RESULT_SESSION = 'questionnaire_results';
+
+    public function __construct(
+        private QuestionnaireResponseService $responses,
+        private QuestionnaireResultMailer $mailer
+    ) {
     }
 
     public function show(Questionnaire $questionnaire)
     {
         if ($reason = $this->unavailable($questionnaire)) {
             return $this->unavailableView($questionnaire, $reason);
+        }
+
+        if ($instrument = $questionnaire->instrument()) {
+            return view('questionnaires.instruments.' . $instrument->key() . '.form', [
+                'questionnaire' => $questionnaire,
+                'instrument' => $instrument,
+                'respondentFields' => $questionnaire->respondentFields(),
+                'branding' => $this->branding(),
+            ]);
         }
 
         return view('questionnaires.public.show', [
@@ -37,17 +53,60 @@ class PublicQuestionnaireController extends Controller
         }
 
         // Bots: se descarta en silencio y se muestra el agradecimiento normal.
-        if (! $request->isSpam()) {
-            $this->responses->store(
+        if ($request->isSpam()) {
+            return redirect()->route('questionnaires.public.thanks', $questionnaire->token);
+        }
+
+        if ($instrument = $questionnaire->instrument()) {
+            $response = $this->responses->storeInstrument(
                 $questionnaire,
-                $request->questions(),
+                $instrument,
                 (array) $request->validated('respondent', []),
                 (array) $request->validated('answers', [])
             );
+
+            $emailed = $this->mailer->send($response, $instrument);
+
+            session()->put(self::RESULT_SESSION . '.' . $questionnaire->token, [
+                'response_id' => $response->id,
+                'emailed' => $emailed,
+            ]);
+
+            return redirect()->route('questionnaires.public.result', $questionnaire->token);
         }
+
+        $this->responses->store(
+            $questionnaire,
+            $request->questions(),
+            (array) $request->validated('respondent', []),
+            (array) $request->validated('answers', [])
+        );
 
         // PRG: recargar la página de gracias no vuelve a enviar.
         return redirect()->route('questionnaires.public.thanks', $questionnaire->token);
+    }
+
+    /** Resultado de un instrumento, solo para quien acaba de responder (sesión). */
+    public function result(Questionnaire $questionnaire)
+    {
+        $instrument = $questionnaire->instrument();
+        $state = session(self::RESULT_SESSION . '.' . $questionnaire->token);
+
+        $response = $instrument && $state
+            ? QuestionnaireResponse::where('questionnaire_id', $questionnaire->id)->find($state['response_id'])
+            : null;
+
+        if (! $response) {
+            return redirect()->route('questionnaires.public.show', $questionnaire->token);
+        }
+
+        return view('questionnaires.public.result', [
+            'questionnaire' => $questionnaire,
+            'instrument' => $instrument,
+            'response' => $response,
+            'emailed' => $state['emailed'],
+            'branding' => $this->branding(),
+        ]);
     }
 
     public function thanks(Questionnaire $questionnaire)
@@ -64,7 +123,11 @@ class PublicQuestionnaireController extends Controller
             return $reason;
         }
 
-        // Los instrumentos cerrados se habilitan en los pasos 5 y 6.
+        if ($questionnaire->instrument()) {
+            return null;
+        }
+
+        // Instrumento cerrado aún sin implementar.
         if (! $questionnaire->hasBuilder()) {
             return 'Esta encuesta estará disponible pronto.';
         }

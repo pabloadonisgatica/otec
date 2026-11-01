@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\QuestionnaireType;
+use App\Services\Questionnaires\Instruments\Instrument;
+use App\Services\Questionnaires\Instruments\InstrumentRegistry;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -95,6 +97,12 @@ class Questionnaire extends Model
             'closed' => 'Esta encuesta cerró el ' . $this->closesAtLocal() . ' y ya no recibe respuestas.',
             default => null,
         };
+    }
+
+    /** Instrumento cerrado de esta encuesta (null en las libres o si aún no está implementado). */
+    public function instrument(): ?Instrument
+    {
+        return InstrumentRegistry::for($this->type);
     }
 
     /** Solo las encuestas libres tienen constructor; los instrumentos son fijos. */

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\QuestionnaireResultsFilterRequest;
 use App\Models\Questionnaire;
 use App\Models\QuestionnaireResponse;
+use App\Services\Questionnaires\QuestionnaireResultMailer;
 use App\Services\Questionnaires\QuestionnaireResultsService;
 use Illuminate\Support\Str;
 
@@ -34,6 +35,7 @@ class QuestionnaireResultsController extends Controller
 
         return view('questionnaires.results.responses', $this->viewData($request, $questionnaire, 'responses') + [
             'responses' => $responses,
+            'instrument' => $questionnaire->instrument(),
         ]);
     }
 
@@ -49,11 +51,26 @@ class QuestionnaireResultsController extends Controller
 
         return view('questionnaires.results.show', [
             'questionnaire' => $questionnaire,
+            'instrument' => $questionnaire->instrument(),
             'response' => $response,
             'answers' => $answers,
             'respondentFields' => array_intersect_key(Questionnaire::RESPONDENT_FIELDS, $questionnaire->respondentFields()),
             'breadcrumbs' => $this->breadcrumbs($questionnaire),
         ]);
+    }
+
+    /** Reenvía el resultado de un instrumento (por ejemplo, si el correo falló). */
+    public function resend(Questionnaire $questionnaire, QuestionnaireResponse $response, QuestionnaireResultMailer $mailer)
+    {
+        abort_unless($response->questionnaire_id === $questionnaire->id, 404);
+        abort_unless($instrument = $questionnaire->instrument(), 404);
+
+        $sent = $mailer->send($response, $instrument);
+
+        return back()->with(
+            $sent ? 'success' : 'error',
+            $sent ? "Resultado reenviado a {$response->email}." : 'No se pudo enviar el correo. Revisa la configuración SMTP y storage/logs/laravel.log.'
+        );
     }
 
     public function destroy(Questionnaire $questionnaire, QuestionnaireResponse $response)

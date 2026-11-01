@@ -5,6 +5,7 @@ namespace App\Services\Questionnaires;
 use App\Models\Questionnaire;
 use App\Models\QuestionnaireQuestion;
 use App\Models\QuestionnaireResponse;
+use App\Services\Questionnaires\Instruments\Instrument;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -39,6 +40,33 @@ class QuestionnaireResponseService
                     // Opciones múltiples en el orden en que aparecen en la pregunta.
                     'choices' => is_array($value) ? array_values(array_intersect($question->options ?? [], $value)) : null,
                     'numeric_value' => $question->isScale() ? (int) $value : null,
+                ]);
+            }
+
+            return $response;
+        });
+    }
+
+    /**
+     * Guarda la respuesta a un instrumento cerrado con su resultado calculado.
+     */
+    public function storeInstrument(Questionnaire $questionnaire, Instrument $instrument, array $respondent, array $answers): QuestionnaireResponse
+    {
+        return DB::transaction(function () use ($questionnaire, $instrument, $respondent, $answers) {
+            $fields = array_keys($questionnaire->respondentFields());
+
+            $response = $questionnaire->responses()->create(
+                collect($respondent)->only($fields)->map(fn ($value) => trim((string) $value) ?: null)->all()
+                + ['result' => $instrument->calculate($answers)]
+            );
+
+            foreach ($instrument->answerRows($answers) as $row) {
+                $response->answers()->create([
+                    'questionnaire_question_id' => null,
+                    'question_label' => $row['label'],
+                    'question_type' => $row['type'],
+                    'value' => $row['value'],
+                    'numeric_value' => $row['numeric'],
                 ]);
             }
 
