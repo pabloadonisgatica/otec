@@ -163,7 +163,8 @@
 
         @if ($activeSurveyTemplates->isEmpty())
             <p class="text-xs text-amber-600 mt-3">
-                No hay plantillas activas todavía. Créalas en Académico → Templates Encuestas.
+                No hay plantillas activas todavía. Créalas en
+                <a href="{{ route('survey-templates.index') }}" class="underline">Configuración → Plantillas de satisfacción</a>.
             </p>
         @endif
 

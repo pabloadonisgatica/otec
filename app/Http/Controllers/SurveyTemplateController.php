@@ -10,17 +10,17 @@ use Illuminate\Support\Facades\Storage;
 
 class SurveyTemplateController extends Controller
 {
+    /**
+     * El listado de plantillas de satisfacción vive en Configuración (pestaña propia).
+     * Se conserva la ruta para no romper enlaces ni las redirecciones de guardar/eliminar.
+     */
     public function index()
     {
-        $templates = SurveyTemplate::withCount('sections')
-            ->latest()
-            ->paginate(15);
+        session()->reflash();
 
-        $breadcrumbs = [
-            ['label' => 'Templates Encuestas'],
-        ];
-
-        return view('survey_templates.index', compact('templates', 'breadcrumbs'));
+        return redirect()
+            ->route('settings.index')
+            ->with('settings_tab', 'satisfaction');
     }
 
     public function create()
@@ -29,7 +29,8 @@ class SurveyTemplateController extends Controller
         $template->setRelation('sections', collect());
 
         $breadcrumbs = [
-            ['label' => 'Templates Encuestas', 'url' => route('survey-templates.index')],
+            ['label' => 'Configuración', 'url' => route('settings.index')],
+            ['label' => 'Plantillas de satisfacción', 'url' => route('survey-templates.index')],
             ['label' => 'Nueva plantilla'],
         ];
 
@@ -66,7 +67,8 @@ class SurveyTemplateController extends Controller
         $survey_template->load('sections.fields');
 
         $breadcrumbs = [
-            ['label' => 'Templates Encuestas', 'url' => route('survey-templates.index')],
+            ['label' => 'Configuración', 'url' => route('settings.index')],
+            ['label' => 'Plantillas de satisfacción', 'url' => route('survey-templates.index')],
             ['label' => 'Editar plantilla'],
         ];
 

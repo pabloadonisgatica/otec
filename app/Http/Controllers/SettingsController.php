@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\UpdateDiplomaSettingsRequest;
 use App\Models\AppSetting;
 use App\Models\DiplomaLogo;
+use App\Models\SurveyTemplate;
 use App\Services\DiplomaSettingsService;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
@@ -26,7 +27,9 @@ class SettingsController extends Controller
 
         $diplomaLogos = DiplomaLogo::orderBy('name')->get();
 
-        return view('settings.index', compact('breadcrumbs', 'users', 'diploma', 'diplomaLogos'));
+        $surveyTemplates = SurveyTemplate::withCount('sections')->orderBy('name')->get();
+
+        return view('settings.index', compact('breadcrumbs', 'users', 'diploma', 'diplomaLogos', 'surveyTemplates'));
     }
 
     public function updateDiploma(UpdateDiplomaSettingsRequest $request, DiplomaSettingsService $diplomaSettings)

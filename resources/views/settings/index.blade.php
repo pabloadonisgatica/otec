@@ -40,6 +40,13 @@
                                     @click="tab = 'users'">
                                 Gestión de usuarios
                             </button>
+
+                            <button type="button"
+                                    class="py-2 px-1 border-b-2 text-sm font-medium"
+                                    :class="tab === 'satisfaction' ? 'border-gray-800 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                    @click="tab = 'satisfaction'">
+                                Plantillas de satisfacción
+                            </button>
                         </nav>
                     </div>
 
@@ -351,6 +358,68 @@
 
                         <div class="mt-4">
                             {{ $users->links() }}
+                        </div>
+                    </div>
+
+
+                    {{-- TAB: Plantillas de satisfacción (encuesta por ejecución, repetida por relator) --}}
+                    <div x-show="tab === 'satisfaction'" x-cloak>
+                        <div class="flex flex-wrap items-start justify-between gap-4">
+                            <div class="max-w-2xl">
+                                <h3 class="text-lg font-semibold text-gray-800">Plantillas de satisfacción</h3>
+                                <p class="mt-1 text-sm text-gray-600">
+                                    Encuesta de satisfacción que responden los participantes al final de cada ejecución,
+                                    evaluando a cada relator. Se arma aquí y se activa desde la pestaña Encuesta de cada ejecución.
+                                    Sus resultados alimentan Calidad → Encuestas.
+                                </p>
+                                <p class="mt-1 text-xs text-gray-500">
+                                    Para encuestas sueltas que se comparten por link o QR, usa Académico → Encuestas.
+                                </p>
+                            </div>
+
+                            <a href="{{ route('survey-templates.create') }}"
+                               class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md text-xs font-semibold uppercase tracking-widest hover:bg-indigo-500">
+                                Nueva plantilla
+                            </a>
+                        </div>
+
+                        <div class="mt-6 overflow-x-auto">
+                            <table class="min-w-full text-sm">
+                                <thead>
+                                    <tr class="text-left border-b border-gray-200">
+                                        <th class="py-2 pr-4">Nombre</th>
+                                        <th class="py-2 pr-4">Secciones</th>
+                                        <th class="py-2 pr-4">Activa</th>
+                                        <th class="py-2 pr-4"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($surveyTemplates as $template)
+                                        <tr class="border-b border-gray-100">
+                                            <td class="py-2 pr-4 font-medium text-gray-900">{{ $template->name }}</td>
+                                            <td class="py-2 pr-4 text-gray-600">{{ $template->sections_count }}</td>
+                                            <td class="py-2 pr-4">
+                                                <span class="px-2 py-1 rounded text-xs {{ $template->active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700' }}">
+                                                    {{ $template->active ? 'Sí' : 'No' }}
+                                                </span>
+                                            </td>
+                                            <td class="py-2 pr-4 text-right whitespace-nowrap">
+                                                <a href="{{ route('survey-templates.edit', $template) }}" class="text-indigo-600 hover:underline mr-3">Editar</a>
+                                                <form action="{{ route('survey-templates.destroy', $template) }}" method="POST" class="inline"
+                                                      onsubmit="return confirm('¿Eliminar esta plantilla?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button class="text-red-600 hover:underline">Eliminar</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="py-6 text-center text-gray-500">Aún no hay plantillas de satisfacción.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
