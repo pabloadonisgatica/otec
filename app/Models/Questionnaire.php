@@ -158,6 +158,48 @@ class Questionnaire extends Model
         return array_intersect_key($fields, self::RESPONDENT_FIELDS);
     }
 
+    /**
+     * Empresa, curso y ejecución a los que está asociada la encuesta, para
+     * mostrarlos como contexto a quien responde.
+     *
+     * @return array<int, array{label: string, value: string}>
+     */
+    public function contextChips(): array
+    {
+        $execution = $this->execution;
+        $course = $execution?->course ?? $this->course;
+        $company = $execution?->company ?? $course?->company ?? $this->company;
+
+        return array_values(array_filter([
+            $company ? ['label' => 'Empresa', 'value' => $company->name] : null,
+            ($course || $execution) ? ['label' => 'Curso', 'value' => $course?->name ?? $execution->course_name] : null,
+            $execution ? ['label' => 'Ejecución', 'value' => $execution->internal_code ?: '#' . $execution->id] : null,
+        ], fn ($chip) => $chip && filled($chip['value'])));
+    }
+
+    /** Nombre de la empresa asociada (directa o vía curso/ejecución). */
+    public function contextCompanyName(): ?string
+    {
+        return collect($this->contextChips())->firstWhere('label', 'Empresa')['value'] ?? null;
+    }
+
+    /**
+     * Datos que se le preguntan a quien responde. La organización no se pregunta
+     * si la encuesta ya está asociada a una empresa: se completa sola.
+     *
+     * @return array<string, string>
+     */
+    public function askedRespondentFields(): array
+    {
+        $fields = $this->respondentFields();
+
+        if ($this->contextCompanyName()) {
+            unset($fields['organization']);
+        }
+
+        return $fields;
+    }
+
     public function isAnonymous(): bool
     {
         return $this->respondentFields() === [];

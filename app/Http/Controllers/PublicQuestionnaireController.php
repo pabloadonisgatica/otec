@@ -33,7 +33,7 @@ class PublicQuestionnaireController extends Controller
             return view('questionnaires.instruments.' . $instrument->key() . '.form', [
                 'questionnaire' => $questionnaire,
                 'instrument' => $instrument,
-                'respondentFields' => $questionnaire->respondentFields(),
+                'respondentFields' => $questionnaire->askedRespondentFields(),
                 'branding' => $this->branding(),
             ]);
         }
@@ -41,7 +41,7 @@ class PublicQuestionnaireController extends Controller
         return view('questionnaires.public.show', [
             'questionnaire' => $questionnaire,
             'sections' => $questionnaire->sections()->with('questions')->get()->filter(fn ($section) => $section->questions->isNotEmpty()),
-            'respondentFields' => $questionnaire->respondentFields(),
+            'respondentFields' => $questionnaire->askedRespondentFields(),
             'branding' => $this->branding(),
         ]);
     }

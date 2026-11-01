@@ -9,6 +9,7 @@
 @section('content')
     <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-6 sm:p-8">
         <h1 class="text-xl font-semibold text-gray-900">{{ $questionnaire->name }}</h1>
+        @include('questionnaires.public._context')
 
         @if ($questionnaire->description)
             <p class="mt-3 text-sm text-gray-700 whitespace-pre-line">{{ $questionnaire->description }}</p>

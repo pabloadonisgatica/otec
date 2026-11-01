@@ -5,6 +5,7 @@
     <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-6 sm:p-8">
         <p class="text-xs font-semibold uppercase tracking-wider text-indigo-700">Resultados</p>
         <h1 class="mt-1 text-xl font-semibold text-gray-900">{{ $instrument->title() }}</h1>
+        @include('questionnaires.public._context')
         <p class="mt-3 text-sm text-gray-700">
             Gracias por completar el cuestionario, <strong>{{ $response->respondentName() }}</strong>.
         </p>

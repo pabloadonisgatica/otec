@@ -19,11 +19,7 @@ class QuestionnaireResponseService
     public function store(Questionnaire $questionnaire, Collection $questions, array $respondent, array $answers): QuestionnaireResponse
     {
         return DB::transaction(function () use ($questionnaire, $questions, $respondent, $answers) {
-            $fields = array_keys($questionnaire->respondentFields());
-
-            $response = $questionnaire->responses()->create(
-                collect($respondent)->only($fields)->map(fn ($value) => trim((string) $value) ?: null)->all()
-            );
+            $response = $questionnaire->responses()->create($this->respondentData($questionnaire, $respondent));
 
             foreach ($questions as $question) {
                 $value = $answers[$question->id] ?? null;
@@ -53,11 +49,8 @@ class QuestionnaireResponseService
     public function storeInstrument(Questionnaire $questionnaire, Instrument $instrument, array $respondent, array $answers): QuestionnaireResponse
     {
         return DB::transaction(function () use ($questionnaire, $instrument, $respondent, $answers) {
-            $fields = array_keys($questionnaire->respondentFields());
-
             $response = $questionnaire->responses()->create(
-                collect($respondent)->only($fields)->map(fn ($value) => trim((string) $value) ?: null)->all()
-                + ['result' => $instrument->calculate($answers)]
+                $this->respondentData($questionnaire, $respondent) + ['result' => $instrument->calculate($answers)]
             );
 
             foreach ($instrument->answerRows($answers) as $row) {
@@ -72,5 +65,21 @@ class QuestionnaireResponseService
 
             return $response;
         });
+    }
+
+    /**
+     * Datos de quien responde. Si la encuesta está asociada a una empresa,
+     * la organización se toma de ahí (no se le pregunta a la persona).
+     */
+    private function respondentData(Questionnaire $questionnaire, array $respondent): array
+    {
+        $fields = array_keys($questionnaire->respondentFields());
+        $data = collect($respondent)->only($fields)->map(fn ($value) => trim((string) $value) ?: null)->all();
+
+        if (in_array('organization', $fields, true) && ($company = $questionnaire->contextCompanyName())) {
+            $data['organization'] = mb_substr($company, 0, 150);
+        }
+
+        return $data;
     }
 }

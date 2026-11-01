@@ -143,6 +143,9 @@
                 <p class="mt-1 text-xs text-gray-500" x-show="fixed[type]" x-cloak>
                     Este instrumento pide estos datos siempre, porque envía el resultado por correo.
                 </p>
+                <p class="mt-1 text-xs text-gray-500" x-show="association !== 'none'" x-cloak>
+                    Como la encuesta está asociada, la organización no se pregunta: se completa con la empresa y se muestra como dato de contexto.
+                </p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

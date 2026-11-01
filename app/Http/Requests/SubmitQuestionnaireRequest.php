@@ -25,7 +25,7 @@ class SubmitQuestionnaireRequest extends FormRequest
     {
         $rules = ['website' => ['nullable']]; // campo trampa anti-bots
 
-        foreach ($this->questionnaire()->respondentFields() as $field => $mode) {
+        foreach ($this->questionnaire()->askedRespondentFields() as $field => $mode) {
             $rules["respondent.{$field}"] = array_filter([
                 $mode === 'required' ? 'required' : 'nullable',
                 'string',
