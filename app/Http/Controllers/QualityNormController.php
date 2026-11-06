@@ -66,7 +66,7 @@ class QualityNormController extends Controller
                 'title' => '7.0 Realización del Servicio de Capacitación',
                 'items' => [
                     ['number' => '7.1', 'label' => 'Planificación de la Realización del Servicio — Requerimiento del Cliente', 'status' => 'done', 'route' => 'quality.requirements.index', 'note' => 'Mismo registro de Requerimientos del Cliente (5.2)'],
-                    ['number' => '7.2', 'label' => 'Procesos Relacionados con el Cliente — Levantamiento del Requerimiento', 'status' => 'pending'],
+                    ['number' => '7.2', 'label' => 'Procesos Relacionados con el Cliente — Levantamiento del Requerimiento', 'status' => 'done', 'route' => 'quality.requirement-intakes.index', 'note' => 'Determinación y revisión del requisito'],
                     ['number' => '7.3', 'label' => 'Diseño y Desarrollo — Formulario SENCE', 'status' => 'done', 'route' => 'courses.index'],
                     ['number' => '7.4', 'label' => 'Compra — Listado de Proveedores', 'status' => 'done', 'route' => 'quality.providers.index'],
                     ['number' => '7.4', 'indent' => 1, 'label' => 'Evaluación de Proveedores', 'status' => 'pending'],

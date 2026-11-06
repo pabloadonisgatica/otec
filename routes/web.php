@@ -34,6 +34,7 @@ use App\Http\Controllers\ProcedureController;
 use App\Http\Controllers\ExternalDocumentController;
 use App\Http\Controllers\QualityRecordController;
 use App\Http\Controllers\ClientRequirementController;
+use App\Http\Controllers\ClientRequirementIntakeController;
 use App\Http\Controllers\QualityPolicyController;
 use App\Http\Controllers\StrategicPlanController;
 use App\Http\Controllers\QualityRepresentativeController;
@@ -622,6 +623,14 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/requerimientos/{requirement}/versiones', [ClientRequirementController::class, 'uploadVersion'])
             ->name('requirements.versions.upload');
+
+        // 7.2 Levantamiento del Requerimiento (determinación + revisión)
+        Route::get('/levantamientos/{intake}/adjunto', [ClientRequirementIntakeController::class, 'attachment'])
+            ->name('requirement-intakes.attachment');
+
+        Route::resource('levantamientos', ClientRequirementIntakeController::class)
+            ->parameters(['levantamientos' => 'intake'])
+            ->names('requirement-intakes');
 
         Route::get('/politica-calidad', [QualityPolicyController::class, 'edit'])
             ->name('policy.edit');
