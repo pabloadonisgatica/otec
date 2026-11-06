@@ -78,27 +78,15 @@
                                         
                                         {{-- Acciones --}}
                                         <td class="py-3 pr-4 text-right">
-                                            <a href="{{ route('executions.show', $execution) }}"
-                                               class="text-gray-700 hover:text-gray-900 font-medium">
-                                                Ver
-                                            </a>
+                                            <x-ui.row-actions>
+                                                <x-ui.row-actions.link :href="route('executions.show', $execution)">Ver</x-ui.row-actions.link>
 
-                                            <a href="{{ route('executions.edit', $execution) }}"
-                                               class="ml-3 text-indigo-600 hover:text-indigo-900 font-medium">
-                                                Editar
-                                            </a>
-
-                                            <form action="{{ route('executions.destroy', $execution) }}"
-                                                  method="POST"
-                                                  class="inline"
-                                                  onsubmit="return confirm('¿Eliminar esta ejecución?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                        class="ml-3 text-red-600 hover:text-red-800 font-medium">
-                                                    Eliminar
-                                                </button>
-                                            </form>
+                                                <x-slot:menu>
+                                                    <x-ui.row-actions.item :href="route('executions.edit', $execution)">Editar</x-ui.row-actions.item>
+                                                    <x-ui.row-actions.divider />
+                                                    <x-ui.row-actions.item :action="route('executions.destroy', $execution)" method="DELETE" danger confirm="¿Eliminar esta ejecución?">Eliminar</x-ui.row-actions.item>
+                                                </x-slot:menu>
+                                            </x-ui.row-actions>
                                         </td>
                                     </tr>
                                 @empty

@@ -36,6 +36,7 @@
                                 <th class="py-2 px-3">Categoría</th>
                                 <th class="py-2 px-3">Contacto</th>
                                 <th class="py-2 px-3">Teléfono</th>
+                                <th class="py-2 px-3">Evaluación</th>
                                 <th class="py-2 px-3"></th>
                             </tr>
                         </thead>
@@ -51,15 +52,28 @@
                                     <td class="py-2 px-3 text-gray-600">{{ $provider->category ?? '—' }}</td>
                                     <td class="py-2 px-3 text-gray-600">{{ $provider->contact_name ?? '—' }}</td>
                                     <td class="py-2 px-3 text-gray-600">{{ $provider->phone ?? $provider->contact_phone ?? '—' }}</td>
+                                    <td class="py-2 px-3 whitespace-nowrap">
+                                        @if($evaluation = $provider->latestEvaluation)
+                                            <span class="px-2 py-1 rounded-full text-xs font-medium {{ $evaluation->resultBadge() }}">{{ $evaluation->resultLabel() }}</span>
+                                            @if($evaluation->isReevaluationOverdue())
+                                                <div class="text-xs text-red-600 mt-1">Reevaluación vencida</div>
+                                            @else
+                                                <div class="text-xs text-gray-500 mt-1">{{ $evaluation->evaluated_at->format('d-m-Y') }}</div>
+                                            @endif
+                                        @else
+                                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Sin evaluar</span>
+                                        @endif
+                                    </td>
                                     <td class="py-2 px-3 text-right whitespace-nowrap">
-                                        <a href="{{ route('quality.providers.show', $provider) }}" class="text-indigo-600 hover:underline text-xs font-medium">Ver</a>
-                                        <span class="text-gray-300 mx-1">|</span>
-                                        <a href="{{ route('quality.providers.edit', $provider) }}" class="text-gray-600 hover:underline text-xs font-medium">Editar</a>
+                                        <x-ui.row-actions>
+                                            <x-ui.row-actions.link :href="route('quality.providers.show', $provider)">Ver</x-ui.row-actions.link>
+                                            <x-ui.row-actions.link :href="route('quality.providers.edit', $provider)">Editar</x-ui.row-actions.link>
+                                        </x-ui.row-actions>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="py-6 text-center text-gray-500">
+                                    <td colspan="7" class="py-6 text-center text-gray-500">
                                         No hay proveedores registrados.
                                     </td>
                                 </tr>

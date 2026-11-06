@@ -41,31 +41,15 @@
                                         <td class="py-2">{{ $instructor->profession }}</td>
                                         <td class="py-2">{{ $instructor->email }}</td>
                                         <td class="py-2 text-right whitespace-nowrap">
-                                            <button type="button"
-                                                    class="text-indigo-600 hover:underline"
-                                                    @click="open('{{ route('instructors.json', $instructor, false) }}')">
-                                                Ver detalle
-                                            </button>
+                                            <x-ui.row-actions>
+                                                <x-ui.row-actions.link x-on:click="open('{{ route('instructors.json', $instructor, false) }}')">Ver detalle</x-ui.row-actions.link>
 
-                                            <span class="mx-2 text-gray-300">|</span>
-
-                                            <a class="underline text-sm"
-                                               href="{{ route('instructors.edit', $instructor) }}">
-                                                Editar
-                                            </a>
-
-                                            <span class="mx-2 text-gray-300">|</span>
-
-                                            <form method="POST"
-                                                  action="{{ route('instructors.destroy', $instructor) }}"
-                                                  class="inline"
-                                                  onsubmit="return confirm('¿Seguro que deseas eliminar este relator?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="underline text-sm text-red-600 hover:text-red-800">
-                                                    Eliminar
-                                                </button>
-                                            </form>
+                                                <x-slot:menu>
+                                                    <x-ui.row-actions.item :href="route('instructors.edit', $instructor)">Editar</x-ui.row-actions.item>
+                                                    <x-ui.row-actions.divider />
+                                                    <x-ui.row-actions.item :action="route('instructors.destroy', $instructor)" method="DELETE" danger confirm="¿Seguro que deseas eliminar este relator?">Eliminar</x-ui.row-actions.item>
+                                                </x-slot:menu>
+                                            </x-ui.row-actions>
                                         </td>
                                     </tr>
                                 @empty

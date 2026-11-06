@@ -53,7 +53,7 @@
                                     <th class="py-2 pr-4">Respuestas</th>
                                     <th class="py-2 pr-4">Estado</th>
                                     <th class="py-2 pr-4">Cierre</th>
-                                    <th class="py-2 pr-4"></th>
+                                    <th class="py-2 pr-1 text-right"><span class="sr-only">Acciones</span></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -85,24 +85,22 @@
                                             </span>
                                         </td>
                                         <td class="py-3 pr-4 text-gray-600 whitespace-nowrap">{{ $questionnaire->closesAtLocal() ?? 'Sin cierre' }}</td>
-                                        <td class="py-3 pr-4 text-right whitespace-nowrap">
-                                            @if ($questionnaire->hasBuilder())
-                                                <a href="{{ route('questionnaires.builder.edit', $questionnaire) }}" class="text-indigo-600 hover:underline mr-3">Preguntas</a>
-                                            @endif
-                                            <a href="{{ route('questionnaires.edit', $questionnaire) }}" class="text-indigo-600 hover:underline mr-3">Editar</a>
-                                            <a href="{{ route('questionnaires.share', $questionnaire) }}" class="text-indigo-600 hover:underline mr-3">Compartir</a>
+                                        <td class="py-2 pr-1">
+                                            <x-ui.row-actions label="Más acciones de «{{ $questionnaire->name }}»">
+                                                <x-ui.row-actions.link :href="route('questionnaires.share', $questionnaire)">Compartir</x-ui.row-actions.link>
 
-                                            <form action="{{ route('questionnaires.duplicate', $questionnaire) }}" method="POST" class="inline">
-                                                @csrf
-                                                <button class="text-gray-600 hover:underline mr-3">Duplicar</button>
-                                            </form>
-
-                                            <form action="{{ route('questionnaires.destroy', $questionnaire) }}" method="POST" class="inline"
-                                                  onsubmit="return confirm('¿Eliminar esta encuesta? Su link dejará de funcionar.')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="text-red-600 hover:underline">Eliminar</button>
-                                            </form>
+                                                <x-slot:menu>
+                                                    <x-ui.row-actions.item :href="route('questionnaires.edit', $questionnaire)">Editar</x-ui.row-actions.item>
+                                                    @if ($questionnaire->hasBuilder())
+                                                        <x-ui.row-actions.item :href="route('questionnaires.builder.edit', $questionnaire)">Preguntas</x-ui.row-actions.item>
+                                                    @endif
+                                                    <x-ui.row-actions.item :href="route('questionnaires.results.summary', $questionnaire)">Ver resultados</x-ui.row-actions.item>
+                                                    <x-ui.row-actions.item :action="route('questionnaires.duplicate', $questionnaire)">Duplicar</x-ui.row-actions.item>
+                                                    <x-ui.row-actions.divider />
+                                                    <x-ui.row-actions.item :action="route('questionnaires.destroy', $questionnaire)" method="DELETE" danger
+                                                                           confirm="¿Eliminar esta encuesta? Su link dejará de funcionar.">Eliminar</x-ui.row-actions.item>
+                                                </x-slot:menu>
+                                            </x-ui.row-actions>
                                         </td>
                                     </tr>
                                 @empty

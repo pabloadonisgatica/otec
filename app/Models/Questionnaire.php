@@ -46,6 +46,7 @@ class Questionnaire extends Model
         'course_id',
         'execution_id',
         'respondent_fields',
+        'settings',
         'banner_path',
     ];
 
@@ -54,6 +55,7 @@ class Questionnaire extends Model
         'is_active' => 'boolean',
         'closes_at' => 'datetime',
         'respondent_fields' => 'array',
+        'settings' => 'array',
     ];
 
     protected static function booted(): void
@@ -102,7 +104,7 @@ class Questionnaire extends Model
     /** Instrumento cerrado de esta encuesta (null en las libres o si aún no está implementado). */
     public function instrument(): ?Instrument
     {
-        return InstrumentRegistry::for($this->type);
+        return InstrumentRegistry::for($this->type, $this);
     }
 
     /** Solo las encuestas libres tienen constructor; los instrumentos son fijos. */

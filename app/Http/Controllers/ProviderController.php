@@ -13,6 +13,7 @@ class ProviderController extends Controller
         $q = trim((string) $request->get('q', ''));
 
         $providers = Provider::query()
+            ->with('latestEvaluation')
             ->when($q !== '', function ($query) use ($q) {
                 $query->where(function ($sub) use ($q) {
                     $sub->where('rut', 'like', "%{$q}%")
@@ -48,6 +49,15 @@ class ProviderController extends Controller
 
     public function show(Provider $provider)
     {
+        $provider->load([
+            'evaluations.evaluator:id,name',
+            'quoteRequests' => fn ($query) => $query
+                ->with('execution:id,internal_code')
+                ->latest('requested_at')
+                ->latest('id')
+                ->limit(10),
+        ]);
+
         return view('quality.providers.show', compact('provider'));
     }
 

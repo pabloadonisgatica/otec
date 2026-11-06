@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\Course;
 use App\Models\Execution;
 use App\Models\Questionnaire;
+use App\Models\SurveyTemplate;
 use App\Services\Questionnaires\QuestionnaireService;
 use Illuminate\Http\Request;
 
@@ -116,6 +117,8 @@ class QuestionnaireController extends Controller
             'companies' => Company::orderBy('name')->get(['id', 'name']),
             'courses' => Course::orderBy('name')->get(['id', 'name']),
             'executions' => Execution::latest('start_date')->get(['id', 'internal_code', 'course_name', 'start_date']),
+            'surveyTemplates' => SurveyTemplate::where('active', true)->orderBy('name')->get(['id', 'name']),
+            'hasResponses' => $questionnaire->exists && $questionnaire->responses()->exists(),
             'breadcrumbs' => [
                 ['label' => 'Encuestas', 'url' => route('questionnaires.index')],
                 ['label' => $title],

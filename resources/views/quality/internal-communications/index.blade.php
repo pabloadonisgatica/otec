@@ -48,14 +48,13 @@
                                     <td class="py-2 px-3 text-gray-600">{{ $communication->channel }}</td>
                                     <td class="py-2 px-3 text-gray-600">{{ $communication->audience }}</td>
                                     <td class="py-2 px-3 text-right whitespace-nowrap">
-                                        <a href="{{ route('quality.internal-communications.edit', $communication) }}" class="text-gray-600 hover:underline text-xs font-medium">Editar</a>
-                                        <span class="text-gray-300 mx-1">|</span>
-                                        <form method="POST" action="{{ route('quality.internal-communications.destroy', $communication) }}"
-                                              class="inline" onsubmit="return confirm('¿Eliminar este registro?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="text-red-600 hover:underline text-xs font-medium">Eliminar</button>
-                                        </form>
+                                        <x-ui.row-actions>
+                                            <x-ui.row-actions.link :href="route('quality.internal-communications.edit', $communication)">Editar</x-ui.row-actions.link>
+
+                                            <x-slot:menu>
+                                                <x-ui.row-actions.item :action="route('quality.internal-communications.destroy', $communication)" method="DELETE" danger confirm="¿Eliminar este registro?">Eliminar</x-ui.row-actions.item>
+                                            </x-slot:menu>
+                                        </x-ui.row-actions>
                                     </td>
                                 </tr>
                             @empty

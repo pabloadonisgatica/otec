@@ -38,9 +38,10 @@
                                         </a>
                                     </td>
                                     <td class="py-2 px-3 text-right whitespace-nowrap">
-                                        <a href="{{ route('quality.job-profiles.show', $profile) }}" class="text-indigo-600 hover:underline text-xs font-medium">Ver</a>
-                                        <span class="text-gray-300 mx-1">|</span>
-                                        <a href="{{ route('quality.job-profiles.edit', $profile) }}" class="text-gray-600 hover:underline text-xs font-medium">Modificar</a>
+                                        <x-ui.row-actions>
+                                            <x-ui.row-actions.link :href="route('quality.job-profiles.show', $profile)">Ver</x-ui.row-actions.link>
+                                            <x-ui.row-actions.link :href="route('quality.job-profiles.edit', $profile)">Editar</x-ui.row-actions.link>
+                                        </x-ui.row-actions>
                                     </td>
                                 </tr>
                             @empty

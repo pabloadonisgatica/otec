@@ -77,45 +77,16 @@
                                         </td>
 
                                         <td class="py-2 text-right whitespace-nowrap">
-                                            <a class="underline text-sm"
-                                               href="{{ route('budgets.edit', $budget) }}">
-                                                Modificar
-                                            </a>
+                                            <x-ui.row-actions>
+                                                <x-ui.row-actions.link :href="route('budgets.pdf', $budget)">PDF</x-ui.row-actions.link>
 
-                                            <span class="mx-2 text-gray-300">|</span>
-
-                                            <a class="underline text-sm"
-                                               href="{{ route('budgets.pdf', $budget) }}">
-                                                PDF
-                                            </a>
-
-                                            <span class="mx-2 text-gray-300">|</span>
-
-                                            <form method="POST"
-                                                  action="{{ route('budgets.duplicate', $budget) }}"
-                                                  class="inline"
-                                                  onsubmit="return confirm('¿Duplicar este presupuesto?');">
-                                                @csrf
-                                                <button type="submit" class="underline text-sm text-gray-700 hover:text-gray-900">
-                                                    Duplicar
-                                                </button>
-                                            </form>
-                                            <span class="mx-2 text-gray-300">|</span>
-
-                                            <form method="POST"
-                                                action="{{ route('budgets.destroy', $budget) }}"
-                                                class="inline"
-                                                onsubmit="return confirm('¿Seguro que deseas eliminar este presupuesto?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="underline text-sm text-red-600 hover:text-red-800">
-                                                    Eliminar
-                                                </button>
-                                            </form>
-
-
-
-
+                                                <x-slot:menu>
+                                                    <x-ui.row-actions.item :href="route('budgets.edit', $budget)">Editar</x-ui.row-actions.item>
+                                                    <x-ui.row-actions.item :action="route('budgets.duplicate', $budget)" confirm="¿Duplicar este presupuesto?">Duplicar</x-ui.row-actions.item>
+                                                    <x-ui.row-actions.divider />
+                                                    <x-ui.row-actions.item :action="route('budgets.destroy', $budget)" method="DELETE" danger confirm="¿Seguro que deseas eliminar este presupuesto?">Eliminar</x-ui.row-actions.item>
+                                                </x-slot:menu>
+                                            </x-ui.row-actions>
                                         </td>
                                     </tr>
                                 @empty

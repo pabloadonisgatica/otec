@@ -44,9 +44,10 @@
                                     <td class="py-2 px-3 text-gray-600 whitespace-nowrap">{{ optional($record->approval_date)->format('d-m-Y') ?? '—' }}</td>
                                     <td class="py-2 px-3 text-gray-600">{{ $record->final_disposition ?? '—' }}</td>
                                     <td class="py-2 px-3 text-right whitespace-nowrap">
-                                        <a href="{{ route('quality.records.show', $record) }}" class="text-indigo-600 hover:underline text-xs font-medium">Ver</a>
-                                        <span class="text-gray-300 mx-1">|</span>
-                                        <a href="{{ route('quality.records.edit', $record) }}" class="text-gray-600 hover:underline text-xs font-medium">Modificar</a>
+                                        <x-ui.row-actions>
+                                            <x-ui.row-actions.link :href="route('quality.records.show', $record)">Ver</x-ui.row-actions.link>
+                                            <x-ui.row-actions.link :href="route('quality.records.edit', $record)">Editar</x-ui.row-actions.link>
+                                        </x-ui.row-actions>
                                     </td>
                                 </tr>
                             @empty

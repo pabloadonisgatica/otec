@@ -16,6 +16,12 @@ interface Instrument
 
     public function title(): string;
 
+    /**
+     * true: pide correo, envía el resultado y lo muestra al terminar.
+     * false: solo agradece (por ejemplo, la encuesta de satisfacción anónima).
+     */
+    public function emailsResult(): bool;
+
     /** Reglas de validación de las respuestas (campo "answers"). */
     public function rules(): array;
 

@@ -84,6 +84,11 @@ class GroupEvaluationInstrument implements Instrument
         return 'Escala de Evaluación de Grupo';
     }
 
+    public function emailsResult(): bool
+    {
+        return true;
+    }
+
     public function rules(): array
     {
         $rules = [];

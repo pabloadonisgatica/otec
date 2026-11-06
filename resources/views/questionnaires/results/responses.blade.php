@@ -41,21 +41,23 @@
                                     <td class="px-4 py-3 text-gray-700">
                                         @if ($instrument)
                                             <span class="whitespace-nowrap">{{ $instrument->shortResult($response->result) }}</span>
-                                            <div class="text-xs {{ $response->result_emailed_at ? 'text-gray-500' : 'text-amber-700' }}">
-                                                {{ $response->result_emailed_at ? 'Correo enviado' : 'Correo no enviado' }}
-                                            </div>
+                                            @if ($instrument->emailsResult())
+                                                <div class="text-xs {{ $response->result_emailed_at ? 'text-gray-500' : 'text-amber-700' }}">
+                                                    {{ $response->result_emailed_at ? 'Correo enviado' : 'Correo no enviado' }}
+                                                </div>
+                                            @endif
                                         @else
                                             {{ $response->answers_count }}
                                         @endif
                                     </td>
                                     <td class="px-4 py-3 text-right whitespace-nowrap">
-                                        <a href="{{ route('questionnaires.results.show', [$questionnaire, $response]) }}" class="text-indigo-600 hover:underline mr-3">Ver</a>
-                                        <form method="POST" action="{{ route('questionnaires.results.destroy', [$questionnaire, $response]) }}" class="inline"
-                                              onsubmit="return confirm('¿Eliminar esta respuesta? No se puede deshacer.')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="text-red-600 hover:underline">Eliminar</button>
-                                        </form>
+                                        <x-ui.row-actions>
+                                            <x-ui.row-actions.link :href="route('questionnaires.results.show', [$questionnaire, $response])">Ver</x-ui.row-actions.link>
+
+                                            <x-slot:menu>
+                                                <x-ui.row-actions.item :action="route('questionnaires.results.destroy', [$questionnaire, $response])" method="DELETE" danger confirm="¿Eliminar esta respuesta? No se puede deshacer.">Eliminar</x-ui.row-actions.item>
+                                            </x-slot:menu>
+                                        </x-ui.row-actions>
                                     </td>
                                 </tr>
                             @empty

@@ -56,31 +56,15 @@
                                         <td class="py-2">{{ ucfirst($participant->status) }}</td>
 
                                         <td class="py-2 text-right whitespace-nowrap">
-                                            <button type="button"
-                                                    class="text-indigo-600 hover:underline"
-                                                    @click="open('{{ route('participants.json', $participant, false) }}')">
-                                                Ver detalle
-                                            </button>
+                                            <x-ui.row-actions>
+                                                <x-ui.row-actions.link x-on:click="open('{{ route('participants.json', $participant, false) }}')">Ver detalle</x-ui.row-actions.link>
 
-                                            <span class="mx-2 text-gray-300">|</span>
-
-                                            <a class="underline text-sm"
-                                               href="{{ route('participants.edit', $participant) }}">
-                                                Editar
-                                            </a>
-
-                                            <span class="mx-2 text-gray-300">|</span>
-
-                                            <form method="POST"
-                                                  action="{{ route('participants.destroy', $participant) }}"
-                                                  class="inline"
-                                                  onsubmit="return confirm('¿Seguro que deseas eliminar este participante?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="underline text-sm text-red-600 hover:text-red-800">
-                                                    Eliminar
-                                                </button>
-                                            </form>
+                                                <x-slot:menu>
+                                                    <x-ui.row-actions.item :href="route('participants.edit', $participant)">Editar</x-ui.row-actions.item>
+                                                    <x-ui.row-actions.divider />
+                                                    <x-ui.row-actions.item :action="route('participants.destroy', $participant)" method="DELETE" danger confirm="¿Seguro que deseas eliminar este participante?">Eliminar</x-ui.row-actions.item>
+                                                </x-slot:menu>
+                                            </x-ui.row-actions>
                                         </td>
                                     </tr>
                                 @empty

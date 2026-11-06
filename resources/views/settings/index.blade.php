@@ -404,13 +404,13 @@
                                                 </span>
                                             </td>
                                             <td class="py-2 pr-4 text-right whitespace-nowrap">
-                                                <a href="{{ route('survey-templates.edit', $template) }}" class="text-indigo-600 hover:underline mr-3">Editar</a>
-                                                <form action="{{ route('survey-templates.destroy', $template) }}" method="POST" class="inline"
-                                                      onsubmit="return confirm('¿Eliminar esta plantilla?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="text-red-600 hover:underline">Eliminar</button>
-                                                </form>
+                                                <x-ui.row-actions>
+                                                    <x-ui.row-actions.link :href="route('survey-templates.edit', $template)">Editar</x-ui.row-actions.link>
+
+                                                    <x-slot:menu>
+                                                        <x-ui.row-actions.item :action="route('survey-templates.destroy', $template)" method="DELETE" danger confirm="¿Eliminar esta plantilla?">Eliminar</x-ui.row-actions.item>
+                                                    </x-slot:menu>
+                                                </x-ui.row-actions>
                                             </td>
                                         </tr>
                                     @empty

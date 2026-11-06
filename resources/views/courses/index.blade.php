@@ -99,27 +99,15 @@
 
                                         {{-- Acciones --}}
                                         <td class="py-3 pr-4 text-right">
-                                            <button type="button"
-                                                    class="text-gray-700 hover:text-gray-900 font-medium"
-                                                    @click="open(@js($course->id))">
-                                                Ver
-                                            </button>
+                                            <x-ui.row-actions>
+                                                <x-ui.row-actions.link x-on:click="open({{ $course->id }})">Ver detalle</x-ui.row-actions.link>
 
-                                            <a href="{{ route('courses.edit', $course) }}"
-                                            class="ml-3 text-indigo-600 hover:text-indigo-900 font-medium">
-                                                Editar
-                                            </a>
-
-                                            <form action="{{ route('courses.destroy', $course) }}"
-                                                method="POST"
-                                                class="inline"
-                                                onsubmit="return confirm('¿Eliminar este curso?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="ml-3 text-red-600 hover:text-red-800 font-medium">
-                                                    Eliminar
-                                                </button>
-                                            </form>
+                                                <x-slot:menu>
+                                                    <x-ui.row-actions.item :href="route('courses.edit', $course)">Editar</x-ui.row-actions.item>
+                                                    <x-ui.row-actions.divider />
+                                                    <x-ui.row-actions.item :action="route('courses.destroy', $course)" method="DELETE" danger confirm="¿Eliminar este curso?">Eliminar</x-ui.row-actions.item>
+                                                </x-slot:menu>
+                                            </x-ui.row-actions>
                                         </td>
                                     </tr>
                                 @empty

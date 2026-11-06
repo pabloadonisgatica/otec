@@ -42,15 +42,13 @@
                                     </td>
                                     <td class="py-2 pr-4 text-gray-600">{{ $t->created_at?->format('Y-m-d') }}</td>
                                     <td class="py-2 pr-4 text-right whitespace-nowrap">
-                                        <a href="{{ route('diploma-templates.edit', $t) }}"
-                                           class="text-indigo-600 hover:underline mr-3">Editar</a>
+                                        <x-ui.row-actions>
+                                            <x-ui.row-actions.link :href="route('diploma-templates.edit', $t)">Editar</x-ui.row-actions.link>
 
-                                        <form action="{{ route('diploma-templates.destroy', $t) }}" method="POST" class="inline"
-                                              onsubmit="return confirm('¿Eliminar plantilla?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="text-red-600 hover:underline">Eliminar</button>
-                                        </form>
+                                            <x-slot:menu>
+                                                <x-ui.row-actions.item :action="route('diploma-templates.destroy', $t)" method="DELETE" danger confirm="¿Eliminar plantilla?">Eliminar</x-ui.row-actions.item>
+                                            </x-slot:menu>
+                                        </x-ui.row-actions>
                                     </td>
                                 </tr>
                             @empty

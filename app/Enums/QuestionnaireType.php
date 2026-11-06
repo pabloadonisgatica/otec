@@ -12,6 +12,7 @@ enum QuestionnaireType: string
     case Custom = 'custom';
     case GroupEvaluation = 'group_evaluation';
     case Leadership = 'leadership';
+    case Satisfaction = 'satisfaction';
 
     public function label(): string
     {
@@ -19,6 +20,7 @@ enum QuestionnaireType: string
             self::Custom => 'Encuesta libre',
             self::GroupEvaluation => 'Escala de Evaluación de Grupo',
             self::Leadership => 'Habilidades Gerenciales y Liderazgo',
+            self::Satisfaction => 'Encuesta de satisfacción',
         };
     }
 
@@ -28,6 +30,7 @@ enum QuestionnaireType: string
             self::Custom => 'Armas tus propias secciones y preguntas.',
             self::GroupEvaluation => '10 ítems en escala 1 a 8. Calcula Madurez para la Tarea y Madurez Psicológica y envía el resultado por correo.',
             self::Leadership => '12 situaciones (A a D). Calcula los estilos Dirigir, Entrenar, Apoyar y Delegar y la flexibilidad para liderar, y envía el resultado por correo.',
+            self::Satisfaction => 'La misma encuesta de satisfacción de las ejecuciones, para un relator que escribes a mano. Anónima.',
         };
     }
 
@@ -48,6 +51,7 @@ enum QuestionnaireType: string
             self::Custom => null,
             self::GroupEvaluation => ['first_name' => 'required', 'last_name' => 'required', 'email' => 'required'],
             self::Leadership => ['first_name' => 'required', 'last_name' => 'required', 'email' => 'required', 'organization' => 'required'],
+            self::Satisfaction => [], // anónima, igual que la encuesta de la ejecución
         };
     }
 }

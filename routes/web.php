@@ -27,6 +27,8 @@ use App\Http\Controllers\ExecutionPlanningController;
 use App\Http\Controllers\NonConformityController;
 use App\Http\Controllers\CorrectiveActionController;
 use App\Http\Controllers\ProviderController;
+use App\Http\Controllers\ProviderEvaluationController;
+use App\Http\Controllers\ProviderQuoteRequestController;
 use App\Http\Controllers\QualityNormController;
 use App\Http\Controllers\QualityProfileController;
 use App\Http\Controllers\QualityDocumentController;
@@ -730,6 +732,24 @@ Route::middleware('auth')->group(function () {
             '/no-conformidades/{non_conformity}/acciones/{action}',
             [CorrectiveActionController::class, 'destroy']
         )->name('non-conformities.actions.destroy');
+
+        // 7.4 Solicitudes de cotización a proveedores
+        Route::get('/solicitudes-cotizacion/{quoteRequest}/pdf', [ProviderQuoteRequestController::class, 'pdf'])
+            ->name('quote-requests.pdf');
+
+        Route::get('/solicitudes-cotizacion/{quoteRequest}/adjunto', [ProviderQuoteRequestController::class, 'attachment'])
+            ->name('quote-requests.attachment');
+
+        Route::resource('solicitudes-cotizacion', ProviderQuoteRequestController::class)
+            ->parameters(['solicitudes-cotizacion' => 'quoteRequest'])
+            ->names('quote-requests');
+
+        // 7.4 Evaluación de proveedores (dentro de cada proveedor)
+        Route::resource('proveedores.evaluaciones', ProviderEvaluationController::class)
+            ->except(['index', 'show'])
+            ->parameters(['proveedores' => 'provider', 'evaluaciones' => 'evaluation'])
+            ->names('providers.evaluations')
+            ->scoped();
 
         Route::get('/proveedores/{provider}/informe', [ProviderController::class, 'report'])
             ->name('providers.report');

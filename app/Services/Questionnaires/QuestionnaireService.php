@@ -4,6 +4,8 @@ namespace App\Services\Questionnaires;
 
 use App\Enums\QuestionnaireType;
 use App\Models\Questionnaire;
+use App\Models\SurveyTemplate;
+use App\Services\Questionnaires\Instruments\SatisfactionInstrument;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -40,6 +42,8 @@ class QuestionnaireService
             'execution_id' => $association === 'execution' ? $data['execution_id'] : null,
             'respondent_fields' => $this->respondentFields($questionnaire->type, $data['respondent_fields'] ?? []),
         ]);
+
+        $this->syncSatisfactionSettings($questionnaire, $data);
 
         $this->syncBanner($questionnaire, $banner, $removeBanner);
 
@@ -80,7 +84,8 @@ class QuestionnaireService
     /** Solo se guardan los campos que se piden. Los instrumentos usan los suyos. */
     private function respondentFields(QuestionnaireType $type, array $input): array
     {
-        if ($fixed = $type->fixedRespondentFields()) {
+        // [] también es fijo: la encuesta de satisfacción es anónima.
+        if (($fixed = $type->fixedRespondentFields()) !== null) {
             return $fixed;
         }
 
@@ -88,6 +93,30 @@ class QuestionnaireService
             ->only(array_keys(Questionnaire::RESPONDENT_FIELDS))
             ->filter(fn ($mode) => in_array($mode, ['optional', 'required'], true))
             ->all();
+    }
+
+    /**
+     * Encuesta de satisfacción libre: al crearla se congela una copia de la plantilla.
+     * Después solo cambia el nombre del relator, y solo mientras no tenga respuestas.
+     */
+    private function syncSatisfactionSettings(Questionnaire $questionnaire, array $data): void
+    {
+        if ($questionnaire->type !== QuestionnaireType::Satisfaction) {
+            return;
+        }
+
+        if (! $questionnaire->exists) {
+            $template = SurveyTemplate::with('sections.fields')->findOrFail($data['survey_template_id']);
+            $questionnaire->settings = SatisfactionInstrument::settingsFor($template, $data['instructor_name']);
+
+            return;
+        }
+
+        if (filled($data['instructor_name'] ?? null) && ! $questionnaire->responses()->exists()) {
+            $settings = (array) $questionnaire->settings;
+            $settings['instructor_name'] = trim($data['instructor_name']);
+            $questionnaire->settings = $settings;
+        }
     }
 
     /** "2026-11-30T18:00" en hora de Chile → UTC. */

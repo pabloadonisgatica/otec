@@ -49,9 +49,10 @@
                                     <td class="py-2 px-3 text-gray-600 whitespace-nowrap">{{ optional($procedure->approval_date)->format('d-m-Y') ?? '—' }}</td>
                                     <td class="py-2 px-3 text-gray-600 whitespace-nowrap">{{ optional($procedure->next_review_date)->format('d-m-Y') ?? '—' }}</td>
                                     <td class="py-2 px-3 text-right whitespace-nowrap">
-                                        <a href="{{ route('quality.procedures.show', $procedure) }}" class="text-indigo-600 hover:underline text-xs font-medium">Ver</a>
-                                        <span class="text-gray-300 mx-1">|</span>
-                                        <a href="{{ route('quality.procedures.edit', $procedure) }}" class="text-gray-600 hover:underline text-xs font-medium">Modificar</a>
+                                        <x-ui.row-actions>
+                                            <x-ui.row-actions.link :href="route('quality.procedures.show', $procedure)">Ver</x-ui.row-actions.link>
+                                            <x-ui.row-actions.link :href="route('quality.procedures.edit', $procedure)">Editar</x-ui.row-actions.link>
+                                        </x-ui.row-actions>
                                     </td>
                                 </tr>
                             @empty

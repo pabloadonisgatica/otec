@@ -90,9 +90,10 @@
                                         </td>
                                         <td class="py-2 px-3 text-gray-600">{{ $intake->budget?->internal_name ?? '—' }}</td>
                                         <td class="py-2 px-3 text-right whitespace-nowrap">
-                                            <a href="{{ route('quality.requirement-intakes.show', $intake) }}" class="text-indigo-600 hover:underline text-xs font-medium">Ver</a>
-                                            <span class="text-gray-300 mx-1">|</span>
-                                            <a href="{{ route('quality.requirement-intakes.edit', $intake) }}" class="text-gray-600 hover:underline text-xs font-medium">Editar</a>
+                                            <x-ui.row-actions>
+                                                <x-ui.row-actions.link :href="route('quality.requirement-intakes.show', $intake)">Ver</x-ui.row-actions.link>
+                                                <x-ui.row-actions.link :href="route('quality.requirement-intakes.edit', $intake)">Editar</x-ui.row-actions.link>
+                                            </x-ui.row-actions>
                                         </td>
                                     </tr>
                                 @empty

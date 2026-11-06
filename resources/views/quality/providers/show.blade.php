@@ -93,6 +93,10 @@
 
             </div>
 
+            @include('quality.providers.evaluations._history')
+
+            @include('quality.quote-requests._provider')
+
             <a href="{{ route('quality.providers.index') }}" class="text-sm text-gray-600 hover:underline">
                 ← Volver al listado
             </a>

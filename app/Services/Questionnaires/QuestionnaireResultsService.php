@@ -126,15 +126,16 @@ class QuestionnaireResultsService
 
     private function exportInstrument(Questionnaire $questionnaire, Instrument $instrument, array $respondentFields, ?Carbon $from, ?Carbon $to): array
     {
-        $headers = array_merge(['N°', 'Fecha'], array_values($respondentFields), $instrument->exportHeaders(), ['Correo enviado']);
+        $emails = $instrument->emailsResult();
+        $headers = array_merge(['N°', 'Fecha'], array_values($respondentFields), $instrument->exportHeaders(), $emails ? ['Correo enviado'] : []);
 
-        $rows = (function () use ($questionnaire, $instrument, $respondentFields, $from, $to) {
+        $rows = (function () use ($questionnaire, $instrument, $respondentFields, $from, $to, $emails) {
             foreach ($this->responsesQuery($questionnaire, $from, $to)->with('answers')->lazyById(200) as $response) {
                 yield array_merge(
                     [$response->id, $response->submittedAtLocal()],
                     array_map(fn ($field) => $response->{$field}, array_keys($respondentFields)),
                     $instrument->exportRow($response),
-                    [$response->result_emailed_at ? 'Sí' : 'No']
+                    $emails ? [$response->result_emailed_at ? 'Sí' : 'No'] : []
                 );
             }
         })();

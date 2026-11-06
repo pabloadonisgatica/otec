@@ -142,23 +142,15 @@
                                     <td class="py-2 pr-4">{{ $d->template->name ?? '-' }}</td>
                                     <td class="py-2 pr-4 text-gray-600">{{ optional($d->issued_at)->format('d-m-Y') }}</td>
                                     <td class="py-2 pr-4 text-right whitespace-nowrap">
-                                        <a href="{{ route('diplomas.pdf', $d) }}" target="_blank" class="text-indigo-600 hover:underline text-xs font-medium">
-                                            PDF
-                                        </a>
-                                        <span class="text-gray-300 mx-1">|</span>
-                                        <a href="{{ route('diplomas.validate', $d->code) }}" target="_blank" class="text-gray-600 hover:underline text-xs font-medium"
-                                           title="Abre la página pública de validación (la misma del QR)">
-                                            Validar
-                                        </a>
-                                        <span class="text-gray-300 mx-1">|</span>
-                                        <form method="POST" action="{{ route('diplomas.destroy', $d) }}" class="inline"
-                                              onsubmit="return confirm('¿Eliminar este diploma? Podrás volver a emitirlo después.')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="text-red-600 hover:underline text-xs font-medium">
-                                                Eliminar
-                                            </button>
-                                        </form>
+                                        <x-ui.row-actions>
+                                            <x-ui.row-actions.link :href="route('diplomas.pdf', $d)" target="_blank">PDF</x-ui.row-actions.link>
+
+                                            <x-slot:menu>
+                                                <x-ui.row-actions.item :href="route('diplomas.validate', $d->code)" target="_blank" title="Abre la página pública de validación (la misma del QR)">Validar</x-ui.row-actions.item>
+                                                <x-ui.row-actions.divider />
+                                                <x-ui.row-actions.item :action="route('diplomas.destroy', $d)" method="DELETE" danger confirm="¿Eliminar este diploma? Podrás volver a emitirlo después.">Eliminar</x-ui.row-actions.item>
+                                            </x-slot:menu>
+                                        </x-ui.row-actions>
                                     </td>
                                 </tr>
                             @empty

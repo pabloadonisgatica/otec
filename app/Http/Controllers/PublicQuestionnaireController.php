@@ -65,6 +65,10 @@ class PublicQuestionnaireController extends Controller
                 (array) $request->validated('answers', [])
             );
 
+            if (! $instrument->emailsResult()) {
+                return redirect()->route('questionnaires.public.thanks', $questionnaire->token);
+            }
+
             $emailed = $this->mailer->send($response, $instrument);
 
             session()->put(self::RESULT_SESSION . '.' . $questionnaire->token, [
@@ -111,7 +115,13 @@ class PublicQuestionnaireController extends Controller
 
     public function thanks(Questionnaire $questionnaire)
     {
-        return view('questionnaires.public.thanks', [
+        // Un instrumento puede tener su propio agradecimiento (la satisfacción usa el de la ejecución).
+        $key = $questionnaire->instrument()?->key();
+        $view = $key && view()->exists("questionnaires.instruments.{$key}.thanks")
+            ? "questionnaires.instruments.{$key}.thanks"
+            : 'questionnaires.public.thanks';
+
+        return view($view, [
             'questionnaire' => $questionnaire,
             'branding' => $this->branding(),
         ]);

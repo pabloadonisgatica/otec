@@ -40,9 +40,10 @@
                                         v{{ $requirement->versions->first()->version_number ?? '—' }}
                                     </td>
                                     <td class="py-2 px-3 text-right whitespace-nowrap">
-                                        <a href="{{ route('quality.requirements.show', $requirement) }}" class="text-indigo-600 hover:underline text-xs font-medium">Ver</a>
-                                        <span class="text-gray-300 mx-1">|</span>
-                                        <a href="{{ route('quality.requirements.edit', $requirement) }}" class="text-gray-600 hover:underline text-xs font-medium">Modificar</a>
+                                        <x-ui.row-actions>
+                                            <x-ui.row-actions.link :href="route('quality.requirements.show', $requirement)">Ver</x-ui.row-actions.link>
+                                            <x-ui.row-actions.link :href="route('quality.requirements.edit', $requirement)">Editar</x-ui.row-actions.link>
+                                        </x-ui.row-actions>
                                     </td>
                                 </tr>
                             @empty

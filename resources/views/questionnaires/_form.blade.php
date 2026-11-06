@@ -41,7 +41,7 @@
             @else
                 <p class="mt-1 text-xs text-gray-500">No se puede cambiar después.</p>
 
-                <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
                     @foreach ($types as $option)
                         <label class="cursor-pointer rounded-lg border p-4 transition"
                                :class="type === '{{ $option->value }}' ? 'border-indigo-600 bg-indigo-50' : 'border-gray-200 hover:bg-gray-50'">
@@ -54,6 +54,48 @@
             @endif
         </div>
     </x-ui.card>
+
+    {{-- Encuesta de satisfacción: plantilla y relator --}}
+    <div x-show="type === 'satisfaction'" x-cloak>
+        <x-ui.card>
+            <div class="p-6 space-y-4">
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900">Encuesta de satisfacción</h3>
+                    <p class="mt-1 text-xs text-gray-500">Mismas preguntas y mismo diseño que la encuesta de satisfacción de las ejecuciones. Las preguntas no se pueden editar.</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Plantilla *</label>
+                    @if ($exists)
+                        <p class="mt-1 text-sm text-gray-800">{{ $questionnaire->settings['template']['name'] ?? '—' }}</p>
+                        <p class="text-xs text-gray-500">Se copió al crear la encuesta. Si la plantilla cambia en Configuración, esta encuesta no cambia.</p>
+                    @else
+                        <select name="survey_template_id" :disabled="type !== 'satisfaction'" class="mt-1 w-full rounded-md border-gray-300">
+                            <option value="">Selecciona una plantilla…</option>
+                            @foreach ($surveyTemplates as $template)
+                                <option value="{{ $template->id }}" @selected(old('survey_template_id') == $template->id)>{{ $template->name }}</option>
+                            @endforeach
+                        </select>
+                        <p class="mt-1 text-xs text-gray-500">Las plantillas activas de Configuración → Plantillas de satisfacción.</p>
+                    @endif
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nombre del relator *</label>
+                    <input type="text" name="instructor_name" maxlength="150"
+                           value="{{ old('instructor_name', $questionnaire->settings['instructor_name'] ?? '') }}"
+                           :disabled="type !== 'satisfaction' || {{ $hasResponses ? 'true' : 'false' }}"
+                           class="mt-1 w-full rounded-md border-gray-300 disabled:bg-gray-50 disabled:text-gray-500"
+                           placeholder="Ej: María González">
+                    <p class="mt-1 text-xs text-gray-500">
+                        {{ $hasResponses
+                            ? 'No se puede cambiar porque la encuesta ya tiene respuestas.'
+                            : 'Aparece en la encuesta como «Evaluando a …». Un relator por encuesta.' }}
+                    </p>
+                </div>
+            </div>
+        </x-ui.card>
+    </div>
 
     {{-- Datos generales --}}
     <x-ui.card>
@@ -140,8 +182,11 @@
                 <p class="mt-1 text-xs text-gray-500" x-show="! fixed[type]">
                     Si no pides ningún dato, la encuesta es anónima.
                 </p>
-                <p class="mt-1 text-xs text-gray-500" x-show="fixed[type]" x-cloak>
+                <p class="mt-1 text-xs text-gray-500" x-show="fixed[type] && Object.keys(fixed[type]).length" x-cloak>
                     Este instrumento pide estos datos siempre, porque envía el resultado por correo.
+                </p>
+                <p class="mt-1 text-xs text-gray-500" x-show="fixed[type] && ! Object.keys(fixed[type]).length" x-cloak>
+                    Esta encuesta es anónima, igual que la encuesta de satisfacción de las ejecuciones.
                 </p>
                 <p class="mt-1 text-xs text-gray-500" x-show="association !== 'none'" x-cloak>
                     Como la encuesta está asociada, la organización no se pregunta: se completa con la empresa y se muestra como dato de contexto.

@@ -75,19 +75,13 @@
                                             {{ \Carbon\Carbon::parse($doc['uploaded_at'])->format('d-m-Y H:i') }}
                                         </td>
                                         <td class="py-2 px-3 text-right whitespace-nowrap">
-                                            <a href="{{ route('quality.financial-documents.download', $index) }}"
-                                               class="text-indigo-600 hover:underline text-xs font-medium">
-                                                Ver / Descargar
-                                            </a>
-                                            <span class="text-gray-300 mx-1">|</span>
-                                            <form method="POST" action="{{ route('quality.financial-documents.delete', $index) }}"
-                                                  class="inline" onsubmit="return confirm('¿Eliminar este documento?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="text-red-600 hover:underline text-xs font-medium">
-                                                    Eliminar
-                                                </button>
-                                            </form>
+                                            <x-ui.row-actions>
+                                                <x-ui.row-actions.link :href="route('quality.financial-documents.download', $index)">Descargar</x-ui.row-actions.link>
+
+                                                <x-slot:menu>
+                                                    <x-ui.row-actions.item :action="route('quality.financial-documents.delete', $index)" method="DELETE" danger confirm="¿Eliminar este documento?">Eliminar</x-ui.row-actions.item>
+                                                </x-slot:menu>
+                                            </x-ui.row-actions>
                                         </td>
                                     </tr>
                                 @endforeach

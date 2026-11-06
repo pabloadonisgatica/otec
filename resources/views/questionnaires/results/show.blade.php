@@ -34,6 +34,7 @@
                     <div class="px-6 py-5">
                         <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
                             <h3 class="text-sm font-semibold text-gray-900">{{ $instrument->title() }}</h3>
+                            @if ($instrument->emailsResult())
                             <div class="flex items-center gap-3 text-sm">
                                 <span class="{{ $response->result_emailed_at ? 'text-gray-500' : 'text-amber-700' }}">
                                     {{ $response->result_emailed_at
@@ -49,6 +50,7 @@
                                     </form>
                                 @endif
                             </div>
+                            @endif
                         </div>
 
                         @include('questionnaires.instruments.' . $instrument->key() . '._scores', ['result' => $response->result])

@@ -154,6 +154,11 @@ class LeadershipInstrument implements Instrument
         return 'Habilidades Gerenciales y Liderazgo';
     }
 
+    public function emailsResult(): bool
+    {
+        return true;
+    }
+
     public function rules(): array
     {
         $rules = [];

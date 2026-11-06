@@ -36,16 +36,15 @@
                                     <td class="py-2 px-3 text-gray-600">{{ $training->hours ?? '—' }}</td>
                                     <td class="py-2 px-3 text-gray-600 whitespace-nowrap">{{ $training->activity_date->format('d-m-Y') }}</td>
                                     <td class="py-2 px-3 text-right whitespace-nowrap">
-                                        <a href="{{ route('quality.internal-trainings.pdf', $training) }}" target="_blank" class="text-indigo-600 hover:underline text-xs font-medium">Ver PDF</a>
-                                        <span class="text-gray-300 mx-1">|</span>
-                                        <a href="{{ route('quality.internal-trainings.edit', $training) }}" class="text-gray-600 hover:underline text-xs font-medium">Modificar</a>
-                                        <span class="text-gray-300 mx-1">|</span>
-                                        <form method="POST" action="{{ route('quality.internal-trainings.destroy', $training) }}"
-                                              class="inline" onsubmit="return confirm('¿Eliminar este registro?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="text-red-600 hover:underline text-xs font-medium">Eliminar</button>
-                                        </form>
+                                        <x-ui.row-actions>
+                                            <x-ui.row-actions.link :href="route('quality.internal-trainings.pdf', $training)" target="_blank">Ver PDF</x-ui.row-actions.link>
+
+                                            <x-slot:menu>
+                                                <x-ui.row-actions.item :href="route('quality.internal-trainings.edit', $training)">Editar</x-ui.row-actions.item>
+                                                <x-ui.row-actions.divider />
+                                                <x-ui.row-actions.item :action="route('quality.internal-trainings.destroy', $training)" method="DELETE" danger confirm="¿Eliminar este registro?">Eliminar</x-ui.row-actions.item>
+                                            </x-slot:menu>
+                                        </x-ui.row-actions>
                                     </td>
                                 </tr>
                             @empty

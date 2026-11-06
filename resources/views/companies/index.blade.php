@@ -49,36 +49,15 @@
                                         <td class="py-2">{{ $company->email }}</td>
 
                                         <td class="py-2 text-right whitespace-nowrap">
-                                            {{-- Ver detalle --}}
-                                            <button type="button"
-                                                    class="text-indigo-600 hover:underline"
-                                                    @click="open('{{ route('companies.show', $company, false) }}')">
-                                                Ver detalle
-                                            </button>
+                                            <x-ui.row-actions>
+                                                <x-ui.row-actions.link x-on:click="open('{{ route('companies.show', $company, false) }}')">Ver detalle</x-ui.row-actions.link>
 
-                                            <span class="mx-2 text-gray-300">|</span>
-
-                                            {{-- Editar --}}
-                                            <a class="underline text-sm"
-                                               href="{{ route('companies.edit', $company) }}">
-                                                Editar
-                                            </a>
-
-                                            <span class="mx-2 text-gray-300">|</span>
-
-                                            {{-- Eliminar --}}
-                                            <form method="POST"
-                                                  action="{{ route('companies.destroy', $company) }}"
-                                                  class="inline"
-                                                  onsubmit="return confirm('¿Seguro que deseas eliminar esta empresa?');">
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <button type="submit"
-                                                        class="underline text-sm text-red-600 hover:text-red-800">
-                                                    Eliminar
-                                                </button>
-                                            </form>
+                                                <x-slot:menu>
+                                                    <x-ui.row-actions.item :href="route('companies.edit', $company)">Editar</x-ui.row-actions.item>
+                                                    <x-ui.row-actions.divider />
+                                                    <x-ui.row-actions.item :action="route('companies.destroy', $company)" method="DELETE" danger confirm="¿Seguro que deseas eliminar esta empresa?">Eliminar</x-ui.row-actions.item>
+                                                </x-slot:menu>
+                                            </x-ui.row-actions>
                                         </td>
                                     </tr>
                                 @empty
