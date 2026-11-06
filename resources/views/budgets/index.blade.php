@@ -73,7 +73,7 @@
                                         </td>
 
                                         <td class="py-2">
-                                            {{ ucfirst($budget->status) }}
+                                            <x-ui.status-badge domain="budget" :status="$budget->status" />
                                         </td>
 
                                         <td class="py-2 text-right whitespace-nowrap">

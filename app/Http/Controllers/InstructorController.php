@@ -54,12 +54,18 @@ class InstructorController extends Controller
         'profession' => ['nullable', 'string', 'max:255'],
         'bio' => ['nullable', 'string'],
 
-        // ✅ archivos
-        'documents' => ['nullable', 'array'],
-        'documents.*' => ['file', 'mimes:pdf', 'max:5120'], // 5MB
+        // Documentos: cada uno con su archivo y su tipo (CV, Título…)
+        'documents' => ['nullable', 'array', 'max:20'],
+        'documents.*.file' => ['required', 'file', 'mimes:pdf', 'max:5120'], // 5MB
+        'documents.*.label' => ['nullable', 'string', 'max:80'],
+    ], [
+        'documents.max' => 'Puedes subir hasta 20 documentos por vez.',
+        'documents.*.file.required' => 'Falta el archivo de uno de los documentos.',
+        'documents.*.file.mimes' => 'Los documentos deben ser PDF.',
+        'documents.*.file.max' => 'Cada documento puede pesar hasta 5 MB.',
     ]);
 
-    $instructor = Instructor::create($data);
+    $instructor = Instructor::create(\Illuminate\Support\Arr::except($data, ['documents']));
 
     // ✅ subir docs si venían
     $this->appendUploadedDocuments($request, $instructor);
@@ -89,12 +95,18 @@ public function update(Request $request, Instructor $instructor)
         'phone' => ['nullable', 'string', 'max:50'],
         'profession' => ['nullable', 'string', 'max:255'],
         'bio' => ['nullable', 'string'],
-        'document_label' => ['nullable', 'string', 'max:50'],
-        'documents' => ['nullable', 'array'],
-        'documents.*' => ['file', 'mimes:pdf', 'max:5120'],
+        // Documentos: cada uno con su archivo y su tipo (CV, Título…)
+        'documents' => ['nullable', 'array', 'max:20'],
+        'documents.*.file' => ['required', 'file', 'mimes:pdf', 'max:5120'], // 5MB
+        'documents.*.label' => ['nullable', 'string', 'max:80'],
+    ], [
+        'documents.max' => 'Puedes subir hasta 20 documentos por vez.',
+        'documents.*.file.required' => 'Falta el archivo de uno de los documentos.',
+        'documents.*.file.mimes' => 'Los documentos deben ser PDF.',
+        'documents.*.file.max' => 'Cada documento puede pesar hasta 5 MB.',
     ]);
 
-    $instructor->update($data);
+    $instructor->update(\Illuminate\Support\Arr::except($data, ['documents']));
 
     // ✅ subir docs (solo UNA vez)
     $this->appendUploadedDocuments($request, $instructor);
@@ -170,15 +182,22 @@ private function appendUploadedDocuments(Request $request, Instructor $instructo
     }));
 
     // 2) si no vienen archivos, igual guardamos la limpieza
-    if (!$request->hasFile('documents')) {
+    // Los documentos llegan anidados (documents[i][file]): hasFile('documents')
+    // solo revisa el primer nivel y no los ve, por eso se revisa la lista directo.
+    $rows = $request->file('documents');
+
+    if (!is_array($rows) || $rows === []) {
         $instructor->documents = $existing;
         $instructor->save();
         return;
     }
-    $label = trim((string) $request->input('document_label', 'Documento'));
-    if ($label === '') $label = 'Documento';
-    foreach ($request->file('documents') as $file) {
+    // Cada fila: documents[i][file] + documents[i][label] (su propio tipo de documento)
+    foreach ($rows as $index => $row) {
+        $file = $row['file'] ?? null;
         if (!$file) continue;
+
+        $label = trim((string) $request->input("documents.{$index}.label", ''));
+        if ($label === '') $label = 'Documento';
 
         $safeBase = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
         $ext = $file->getClientOriginalExtension();

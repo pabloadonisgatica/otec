@@ -36,9 +36,7 @@
                                 <tr class="border-b">
                                     <td class="py-2 pr-4 font-medium">{{ $t->name }}</td>
                                     <td class="py-2 pr-4">
-                                        <span class="px-2 py-1 rounded text-xs {{ $t->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700' }}">
-                                            {{ $t->is_active ? 'Sí' : 'No' }}
-                                        </span>
+                                        <x-ui.status-badge domain="active" :status="(bool) $t->is_active" />
                                     </td>
                                     <td class="py-2 pr-4 text-gray-600">{{ $t->created_at?->format('Y-m-d') }}</td>
                                     <td class="py-2 pr-4 text-right whitespace-nowrap">

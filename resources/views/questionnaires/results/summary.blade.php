@@ -52,7 +52,7 @@
                                     <h3 class="text-sm font-semibold text-gray-900">{{ $item['title'] }}</h3>
                                     <span class="text-xs text-gray-500 whitespace-nowrap">
                                         @if ($item['deleted'])
-                                            <span class="rounded bg-gray-100 px-2 py-0.5 text-gray-600">Pregunta eliminada</span>
+                                            <x-ui.badge tone="attention">Pregunta eliminada</x-ui.badge>
                                         @endif
                                         {{ $item['type_label'] }}
                                     </span>

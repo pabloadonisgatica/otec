@@ -26,8 +26,10 @@ class ExecutionSurveyResultsService
             $instructorAnswers = $allAnswers->where('instructor_id', $instructor->id);
 
             return [
-                'instructor' => $instructor,
-                'sections'   => $sections->map(function ($section) use ($instructorAnswers) {
+                'instructor'      => $instructor,
+                // Cada participante evalúa solo a su relator: respuestas recibidas por relator.
+                'responses_count' => $instructorAnswers->pluck('execution_survey_response_id')->unique()->count(),
+                'sections'        => $sections->map(function ($section) use ($instructorAnswers) {
                     return [
                         'section' => $section,
                         'fields'  => $section->fields->map(function ($field) use ($instructorAnswers) {

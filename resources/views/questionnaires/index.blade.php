@@ -10,14 +10,6 @@
         </div>
     </x-slot>
 
-    @php
-        $badges = [
-            'active' => 'bg-green-100 text-green-800',
-            'inactive' => 'bg-gray-100 text-gray-700',
-            'closed' => 'bg-amber-100 text-amber-800',
-        ];
-    @endphp
-
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
@@ -80,9 +72,7 @@
                                             @endif
                                         </td>
                                         <td class="py-3 pr-4">
-                                            <span class="px-2 py-1 rounded text-xs {{ $badges[$questionnaire->status()] }}">
-                                                {{ $questionnaire->statusLabel() }}
-                                            </span>
+                                            <x-ui.status-badge domain="questionnaire" :status="$questionnaire->status()" />
                                         </td>
                                         <td class="py-3 pr-4 text-gray-600 whitespace-nowrap">{{ $questionnaire->closesAtLocal() ?? 'Sin cierre' }}</td>
                                         <td class="py-2 pr-1">

@@ -327,7 +327,7 @@
                                             <td class="py-3 pr-4 text-gray-700">{{ $u->email }}</td>
                                             <td class="py-3 pr-4">
                                                 <span class="inline-flex px-2 py-1 rounded text-xs font-semibold
-                                                    {{ $u->role === 'admin' ? 'bg-indigo-50 text-indigo-700' : 'bg-gray-100 text-gray-700' }}">
+                                                    {{ $u->role === 'admin' ? 'bg-indigo-50 text-indigo-700' : 'bg-blue-50 text-blue-700' }}">
                                                     {{ $u->role === 'admin' ? 'Administrador' : 'Usuario' }}
                                                 </span>
                                             </td>
@@ -399,9 +399,7 @@
                                             <td class="py-2 pr-4 font-medium text-gray-900">{{ $template->name }}</td>
                                             <td class="py-2 pr-4 text-gray-600">{{ $template->sections_count }}</td>
                                             <td class="py-2 pr-4">
-                                                <span class="px-2 py-1 rounded text-xs {{ $template->active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700' }}">
-                                                    {{ $template->active ? 'Sí' : 'No' }}
-                                                </span>
+                                                <x-ui.status-badge domain="active" :status="(bool) $template->active" />
                                             </td>
                                             <td class="py-2 pr-4 text-right whitespace-nowrap">
                                                 <x-ui.row-actions>

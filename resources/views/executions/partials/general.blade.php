@@ -43,8 +43,8 @@
 
         <div>
             <p class="text-xs uppercase text-gray-500">Estado</p>
-            <p class="font-semibold">
-                {{ ucfirst(str_replace('_',' ',$execution->status)) }}
+            <p class="mt-1">
+                <x-ui.status-badge domain="execution" :status="$execution->status" />
             </p>
         </div>
 

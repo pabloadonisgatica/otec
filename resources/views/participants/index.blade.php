@@ -53,7 +53,7 @@
                                         </td>
                                         <td class="py-2">{{ $participant->company->name ?? '-' }}</td>
                                         <td class="py-2">{{ $participant->email ?? '-' }}</td>
-                                        <td class="py-2">{{ ucfirst($participant->status) }}</td>
+                                        <td class="py-2"><x-ui.status-badge domain="participant" :status="$participant->status" /></td>
 
                                         <td class="py-2 text-right whitespace-nowrap">
                                             <x-ui.row-actions>

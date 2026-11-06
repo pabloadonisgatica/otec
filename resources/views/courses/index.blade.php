@@ -76,7 +76,7 @@
 
                                         {{-- Tipo --}}
                                         <td class="py-3 pr-4">
-                                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700">
+                                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-indigo-50 text-indigo-700">
                                                 {{ $typeLabels[$course->course_type] ?? ($course->course_type ?: '—') }}
                                             </span>
                                         </td>

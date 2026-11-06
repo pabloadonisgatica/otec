@@ -17,7 +17,7 @@
         <select name="company_id" class="mt-1 w-full rounded-md border-gray-300" required>
             <option value="">Selecciona una empresa…</option>
             @foreach($companies as $company)
-                <option value="{{ $company->id }}" @selected((int)$v('company_id') === $company->id)>
+                <option value="{{ $company->id }}" @selected((int)$v('company_id', request('company_id')) === $company->id)>
                     {{ $company->name }}
                 </option>
             @endforeach

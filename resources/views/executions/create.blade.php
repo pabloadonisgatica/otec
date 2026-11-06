@@ -47,29 +47,6 @@
                                     @endforeach
                                 </select>
                             </div>
-                            {{-- Participantes --}}
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Participantes
-                                </label>
-
-                                <select name="participants[]"
-                                    multiple
-                                    class="w-full border-gray-300 rounded-md shadow-sm h-56">
-
-                                    @foreach($participants as $participant)
-                                    <option value="{{ $participant->id }}">
-                                        {{ $participant->first_name }}
-                                        {{ $participant->last_name }}
-                                    </option>
-                                    @endforeach
-
-                                </select>
-
-                                <p class="mt-1 text-xs text-gray-500">
-                                    Mantén presionado Ctrl (o Cmd en Mac) para seleccionar múltiples participantes.
-                                </p>
-                            </div>
                             {{-- Modalidad (readonly) --}}
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">

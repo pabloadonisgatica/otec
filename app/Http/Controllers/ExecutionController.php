@@ -31,7 +31,6 @@ class ExecutionController extends Controller
     {
         $courses = \App\Models\Course::orderBy('name')->get();
         $companies = \App\Models\Company::orderBy('name')->get();
-        $participants = \App\Models\Participant::orderBy('first_name')->get();
 
         $breadcrumbs = [
             ['label' => 'Ejecuciones', 'url' => route('executions.index')],
@@ -41,7 +40,6 @@ class ExecutionController extends Controller
         return view('executions.create', compact(
             'courses',
             'companies',
-            'participants',
             'breadcrumbs'
         ));
     }
@@ -62,9 +60,6 @@ class ExecutionController extends Controller
 
 
             'observations' => ['nullable', 'string'],
-
-            'participants' => ['nullable', 'array'],
-            'participants.*' => ['exists:participants,id'],
         ]);
 
         $course = \App\Models\Course::findOrFail($validated['course_id']);
@@ -102,15 +97,10 @@ class ExecutionController extends Controller
             'observations' => $validated['observations'] ?? null,
         ]);
 
-        if (!empty($validated['participants'])) {
-            $execution->participants()->syncWithoutDetaching(
-                $validated['participants']
-            );
-        }
-
+        // Los participantes se agregan después, desde la pestaña Participantes de la ejecución.
         return redirect()
-            ->route('executions.index')
-            ->with('status', 'Ejecución creada correctamente.');
+            ->route('executions.show', [$execution, 'tab' => 'participants'])
+            ->with('status', 'Ejecución creada. Ahora agrega a los participantes de ' . ($execution->company?->name ?? 'la empresa') . '.');
     }
     public function show(
         \App\Models\Execution $execution,
@@ -133,7 +123,17 @@ class ExecutionController extends Controller
             'checklistResponses',
         ]);
 
-        $participants = \App\Models\Participant::orderBy('first_name')->get();
+        // Solo participantes de la empresa de la ejecución que aún no están inscritos
+        // (pueden estar en otras ejecuciones: son cursos distintos).
+        $companyParticipantsCount = \App\Models\Participant::where('company_id', $execution->company_id)->count();
+
+        $availableParticipants = \App\Models\Participant::query()
+            ->where('company_id', $execution->company_id)
+            ->whereNotIn('id', $execution->participants->pluck('id'))
+            ->orderBy('first_name')
+            ->orderBy('last_name')
+            ->get();
+
         $instructors = \App\Models\Instructor::orderBy('name')->get();
 
         $checklistItems = \App\Models\ExecutionChecklistItem::orderBy('sort_order')->get();
@@ -161,7 +161,8 @@ class ExecutionController extends Controller
 
         return view('executions.show', compact(
             'execution',
-            'participants',
+            'availableParticipants',
+            'companyParticipantsCount',
             'instructors',
             'breadcrumbs',
             'tab',
@@ -305,7 +306,13 @@ class ExecutionController extends Controller
     public function addParticipant(Request $request, Execution $execution)
     {
         $validated = $request->validate([
-            'participant_id' => ['required', 'exists:participants,id'],
+            'participant_id' => [
+                'required',
+                \Illuminate\Validation\Rule::exists('participants', 'id')
+                    ->where('company_id', $execution->company_id),
+            ],
+        ], [
+            'participant_id.exists' => 'El participante no pertenece a la empresa de esta ejecución.',
         ]);
 
         $execution->participants()->syncWithoutDetaching([
@@ -366,19 +373,30 @@ class ExecutionController extends Controller
     }
     public function addCompanyParticipants(\App\Models\Execution $execution)
     {
+        // Agrega a todos los participantes de la empresa de la ejecución.
         $participantIds = \App\Models\Participant::query()
             ->where('company_id', $execution->company_id)
             ->pluck('id')
             ->toArray();
 
-        $execution->participants()->syncWithoutDetaching($participantIds);
+        $attached = count($execution->participants()->syncWithoutDetaching($participantIds)['attached']);
+        $companyName = $execution->company?->name ?? 'La empresa';
+
+        // El mensaje dice lo que realmente pasó.
+        [$type, $message] = match (true) {
+            $participantIds === [] => ['error', "{$companyName} no tiene participantes registrados. Cárgalos primero."],
+            $attached === 0 => ['status', "Todos los participantes de {$companyName} ya estaban en esta ejecución."],
+            default => ['status', $attached === 1
+                ? "Se agregó 1 participante de {$companyName}."
+                : "Se agregaron {$attached} participantes de {$companyName}."],
+        };
 
         return redirect()
             ->route('executions.show', [
                 $execution,
                 'tab' => 'participants'
             ])
-            ->with('status', 'Participantes agregados correctamente.');
+            ->with($type, $message);
     }
     public function removeAllParticipants(
         \App\Models\Execution $execution

@@ -24,21 +24,14 @@ class ExecutionSurveyTemplateController extends Controller
             return back()->with('error', 'Esta ejecución ya tiene una encuesta generada.');
         }
 
-        $template = SurveyTemplate::with('sections')->findOrFail($data['survey_template_id']);
+        SurveyTemplate::findOrFail($data['survey_template_id']);
 
-        // Si la plantilla tiene secciones que se repiten por relator,
-        // la ejecución DEBE tener al menos un relator asignado.
-        $hasRepeatingSection = $template->sections->contains('repeats_per_instructor', true);
-
-        if ($hasRepeatingSection) {
-            $execution->loadMissing('instructors');
-
-            if ($execution->instructors->isEmpty()) {
-                return back()->with(
-                    'error',
-                    'Esta plantilla tiene secciones de evaluación de relatores, pero la ejecución no tiene ningún relator asignado. Asigna al menos un relator antes de generar la encuesta.'
-                );
-            }
+        // Cada participante elige y evalúa a su relator: sin relatores no hay a quién evaluar.
+        if ($execution->instructors()->doesntExist()) {
+            return back()->with(
+                'error',
+                'La ejecución no tiene relatores asignados. Asigna al menos un relator antes de generar la encuesta.'
+            );
         }
 
         ExecutionSurvey::create([

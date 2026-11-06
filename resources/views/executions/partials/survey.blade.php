@@ -128,10 +128,17 @@
                         <div class="mb-6">
                             <h4 class="text-sm font-semibold text-gray-700 uppercase mb-3">
                                 Relator: {{ $row['instructor']->name }}
+                                <span class="ms-2 normal-case font-normal text-gray-500">
+                                    · {{ $row['responses_count'] }} {{ $row['responses_count'] === 1 ? 'respuesta' : 'respuestas' }}
+                                </span>
                             </h4>
-                            @foreach ($row['sections'] as $sectionResult)
-                                @include('executions.partials.survey-field-results', ['fields' => $sectionResult['fields']])
-                            @endforeach
+                            @if ($row['responses_count'] === 0)
+                                <p class="text-sm text-gray-500">Ningún participante ha evaluado a este relator todavía.</p>
+                            @else
+                                @foreach ($row['sections'] as $sectionResult)
+                                    @include('executions.partials.survey-field-results', ['fields' => $sectionResult['fields']])
+                                @endforeach
+                            @endif
                         </div>
                     @endforeach
 

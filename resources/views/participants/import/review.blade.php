@@ -17,7 +17,7 @@
         $notImported = $counts['error'] + $counts['repeated'] + $counts['existing'];
         $badges = [
             'new' => ['Nuevo', 'bg-green-100 text-green-800'],
-            'existing' => ['Ya existe', 'bg-gray-100 text-gray-700'],
+            'existing' => ['Ya existe', 'bg-blue-50 text-blue-700'],
             'repeated' => ['Repetido', 'bg-amber-100 text-amber-800'],
             'error' => ['Con error', 'bg-red-100 text-red-800'],
         ];

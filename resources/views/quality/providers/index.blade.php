@@ -61,7 +61,7 @@
                                                 <div class="text-xs text-gray-500 mt-1">{{ $evaluation->evaluated_at->format('d-m-Y') }}</div>
                                             @endif
                                         @else
-                                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Sin evaluar</span>
+                                            <x-ui.badge tone="warning">Sin evaluar</x-ui.badge>
                                         @endif
                                     </td>
                                     <td class="py-2 px-3 text-right whitespace-nowrap">

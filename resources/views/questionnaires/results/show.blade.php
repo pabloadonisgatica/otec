@@ -65,7 +65,7 @@
                             <dt class="text-sm font-medium text-gray-900">
                                 {{ $answer->question_label }}
                                 @unless ($answer->questionnaire_question_id || $instrument)
-                                    <span class="ms-1 rounded bg-gray-100 px-2 py-0.5 text-xs font-normal text-gray-600">Pregunta eliminada</span>
+                                    <x-ui.badge tone="attention" class="ms-1">Pregunta eliminada</x-ui.badge>
                                 @endunless
                             </dt>
                             <dd class="mt-1 text-sm text-gray-700 whitespace-pre-line">

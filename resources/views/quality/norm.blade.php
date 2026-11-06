@@ -64,7 +64,7 @@
                                         <div class="flex items-center gap-2 shrink-0">
 
                                             @if(!empty($item['chip']))
-                                                <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full whitespace-nowrap">
+                                                <span class="text-xs text-blue-700 bg-blue-50 px-2 py-1 rounded-full whitespace-nowrap">
                                                     {{ $item['chip'] }}
                                                 </span>
                                             @endif
@@ -76,8 +76,8 @@
                                                     {{ $item['status'] === 'done' ? '🟢' : '🟡' }} Ver
                                                 </a>
                                             @else
-                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-400 whitespace-nowrap">
-                                                    ⚪ Pendiente
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 whitespace-nowrap">
+                                                    🔴 Pendiente
                                                 </span>
                                             @endif
 

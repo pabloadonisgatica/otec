@@ -3,81 +3,52 @@
 namespace App\Http\Controllers;
 
 use App\Models\ExecutionSurvey;
-use App\Models\ExecutionSurveyResponse;
+use App\Services\ExecutionSurveySubmissionService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
+/**
+ * Encuesta de satisfacción pública de una ejecución (link/QR, sin login).
+ * El participante elige su relator y evalúa solo a ese relator.
+ */
 class PublicExecutionSurveyController extends Controller
 {
+    public function __construct(private ExecutionSurveySubmissionService $submissions)
+    {
+    }
+
     public function show(string $token)
     {
-        $executionSurvey = ExecutionSurvey::where('token', $token)
-            ->with(['template.sections.fields', 'execution.instructors', 'execution.course'])
-            ->firstOrFail();
-
-        $sections    = $executionSurvey->template->sections;
-        $instructors = $executionSurvey->execution->instructors;
+        $executionSurvey = $this->find($token);
 
         return view('execution_survey.show', [
             'executionSurvey' => $executionSurvey,
-            'execution'       => $executionSurvey->execution,
-            'sections'        => $sections,
-            'instructors'     => $instructors,
+            'execution' => $executionSurvey->execution,
+            'sections' => $executionSurvey->template->sections,
+            'instructors' => $this->submissions->instructors($executionSurvey),
         ]);
     }
 
     public function store(Request $request, string $token)
     {
-        $executionSurvey = ExecutionSurvey::where('token', $token)
-            ->with(['template.sections.fields', 'execution.instructors'])
-            ->firstOrFail();
+        $executionSurvey = $this->find($token);
 
-        $sections    = $executionSurvey->template->sections;
-        $instructors = $executionSurvey->execution->instructors;
-
-        // Reglas de validación: cada campo de cada sección
-        // se valida para cada relator por separado.
-        $rules    = [];
-        $messages = [];
-
-        foreach ($instructors as $instructor) {
-            foreach ($sections as $section) {
-                foreach ($section->fields as $field) {
-                    $key         = "instructors.{$instructor->id}.{$field->id}";
-                    $rules[$key] = $this->rulesForField($field);
-
-                    if ($field->required) {
-                        $messages["{$key}.required"] =
-                            "\"{$field->label}\" (evaluación de {$instructor->name}) es obligatorio.";
-                        $messages["{$key}.in"] =
-                            "La opción de \"{$field->label}\" (evaluación de {$instructor->name}) no es válida.";
-                    }
-                }
-            }
+        // Sin relatores asignados no hay a quién evaluar (la página muestra un aviso).
+        if ($this->submissions->instructors($executionSurvey)->isEmpty()) {
+            return redirect()->route('execution-survey.public.show', $token);
         }
 
-        $data = $request->validate($rules, $messages);
+        $data = $request->validate(
+            $this->submissions->rules($executionSurvey),
+            $this->submissions->messages($executionSurvey)
+        );
 
-        DB::transaction(function () use ($data, $executionSurvey, $sections, $instructors) {
-            $response = ExecutionSurveyResponse::create([
-                'execution_survey_id' => $executionSurvey->id,
-                'submitted_at'        => now(),
-            ]);
+        $this->submissions->store(
+            $executionSurvey,
+            (int) $data['instructor_id'],
+            $data['answers'] ?? []
+        );
 
-            foreach ($instructors as $instructor) {
-                foreach ($sections as $section) {
-                    foreach ($section->fields as $field) {
-                        $response->answers()->create([
-                            'survey_template_field_id' => $field->id,
-                            'instructor_id'            => $instructor->id,
-                            'value'                    => $data['instructors'][$instructor->id][$field->id] ?? null,
-                        ]);
-                    }
-                }
-            }
-        });
-
-        // PRG pattern: redirect para evitar doble envío.
+        // PRG: recargar la página de gracias no vuelve a enviar.
         return redirect()->route('execution-survey.public.thanks', $token);
     }
 
@@ -92,16 +63,10 @@ class PublicExecutionSurveyController extends Controller
         ]);
     }
 
-    private function rulesForField($field): array
+    private function find(string $token): ExecutionSurvey
     {
-        $rules = [$field->required ? 'required' : 'nullable', 'string'];
-
-        if (in_array($field->type, ['radio', 'select'], true) && ! empty($field->options)) {
-            $rules[] = 'in:' . implode(',', $field->options);
-        } else {
-            $rules[] = 'max:5000';
-        }
-
-        return $rules;
+        return ExecutionSurvey::where('token', $token)
+            ->with(['template.sections.fields', 'execution.instructors', 'execution.course'])
+            ->firstOrFail();
     }
 }

@@ -18,9 +18,8 @@
                         @method('PUT')
 
                         @include('instructors.partials.form', ['instructor' => $instructor])
-                       <x-file-upload
-                            mode="upload"
-                            label="Subir nuevos documentos (PDF)"
+                        <x-documents-uploader
+                            label="Agregar documentos (PDF)"
                         />
 
 

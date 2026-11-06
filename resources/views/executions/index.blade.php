@@ -67,9 +67,7 @@
 
                                         {{-- Estado --}}
                                         <td class="py-3 pr-4">
-                                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700">
-                                                {{ ucfirst(str_replace('_',' ',$execution->status)) }}
-                                            </span>
+                                            <x-ui.status-badge domain="execution" :status="$execution->status" />
                                         </td>
                                         {{-- Participantes --}}
                                         <td class="py-3 pr-4 text-right text-gray-900 font-medium">

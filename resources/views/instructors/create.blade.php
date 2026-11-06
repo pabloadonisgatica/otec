@@ -19,9 +19,11 @@
 
     @include('instructors.partials.form', ['instructor' => null])
 
-    <x-file-upload
-        label="Documentos del relator (PDF)"
-    />
+    <div class="mt-6">
+        <x-documents-uploader
+            label="Documentos del relator (PDF)"
+        />
+    </div>
 
     <div class="mt-4 flex justify-end gap-2">
         <a href="{{ route('instructors.index') }}"
